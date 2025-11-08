@@ -5,9 +5,12 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const db = require('./config/db'); // conexión a MySQL
-const authRoutes = require('./routes/authRoutes'); // rutas de autenticación
-const contenidoRoutes = require('./routes/contenidoRoutes'); // ✅ rutas de contenido educativo
+const db = require('./config/db');
+
+// Rutas importadas
+const authRoutes = require('./routes/authRoutes');
+const contenidoRoutes = require('./routes/contenidoRoutes');
+const progresoRoutes = require('./routes/progresoRoutes'); // ✅ progreso
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,14 +24,13 @@ app.use(express.json());
 // ==============================
 // 🚦 RUTAS PRINCIPALES
 // ==============================
+app.use('/api/auth', authRoutes);        // Autenticación
+app.use('/api/contenido', contenidoRoutes); // Contenido educativo
+app.use('/api/progreso', progresoRoutes);   // Progreso del usuario
 
-// Autenticación
-app.use('/api/auth', authRoutes);
-
-// Contenido educativo (CRUD)
-app.use('/api/contenido', contenidoRoutes); // ✅ agrega esta línea
-
-// Ruta de salud / verificación del servidor
+// ==============================
+// 🩺 RUTA DE SALUD (test rápido)
+// ==============================
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
