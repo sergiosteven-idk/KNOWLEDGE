@@ -1,59 +1,64 @@
 // ==============================
-// 📊 DASHBOARD DE USUARIO — KNOWLEDGE
+// 📤 DASHBOARD DE USUARIO — SUBIDA DE CONTENIDO
 // ==============================
 import React, { useEffect, useState } from "react";
-import { obtenerProgreso, obtenerContenidoUsuario, subirContenido } from "../services/api";
+import {
+  subirContenido,
+  obtenerContenidoUsuario,
+  obtenerProgreso,
+} from "../services/api";
 import { useAccessibility } from "../contexts/AccessibilityContext";
 
 const Dashboard = () => {
   const { highContrast, darkMode } = useAccessibility();
-
-  const [progreso, setProgreso] = useState<any[]>([]);
   const [contenidos, setContenidos] = useState<any[]>([]);
+  const [progreso, setProgreso] = useState<any[]>([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [archivo, setArchivo] = useState<File | null>(null);
+
   const [nuevo, setNuevo] = useState({
     titulo: "",
     descripcion: "",
     tipo: "video",
-    url_contenido: "",
     nivel_dificultad: "principiante",
   });
 
   const user = JSON.parse(localStorage.getItem("usuario") || "{}");
-  const token = localStorage.getItem("token") || "";
 
-  // Cargar progreso y contenido del usuario
   useEffect(() => {
     const cargarDatos = async () => {
-      try {
-        const dataProgreso = await obtenerProgreso(user.id, token);
-        setProgreso(dataProgreso);
-
-        const dataContenidos = await obtenerContenidoUsuario(user.id);
-        setContenidos(dataContenidos);
-      } catch (err) {
-        console.error("❌ Error al cargar datos del dashboard:", err);
-      }
+      const prog = await obtenerProgreso(user.id);
+      const cont = await obtenerContenidoUsuario(user.id);
+      setProgreso(prog);
+      setContenidos(cont);
     };
     cargarDatos();
   }, []);
 
-  // Subir contenido nuevo
   const handleSubir = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    Object.entries(nuevo).forEach(([k, v]) => formData.append(k, v));
+    if (archivo) formData.append("archivo", archivo);
+    formData.append("id_autor", user.id);
+
     try {
-      await subirContenido({ ...nuevo, id_autor: user.id });
+      await subirContenido(formData, setUploadProgress);
       alert("✅ Contenido enviado para revisión.");
       setNuevo({
         titulo: "",
         descripcion: "",
         tipo: "video",
-        url_contenido: "",
         nivel_dificultad: "principiante",
       });
-      const dataContenidos = await obtenerContenidoUsuario(user.id);
-      setContenidos(dataContenidos);
+      setArchivo(null);
+      setUploadProgress(0);
+      const cont = await obtenerContenidoUsuario(user.id);
+      setContenidos(cont);
     } catch (error) {
       alert("❌ Error al subir contenido.");
+      setUploadProgress(0);
     }
   };
 
@@ -67,103 +72,65 @@ const Dashboard = () => {
           : "bg-white text-gray-800"
       }`}
     >
-      <h1 className="text-3xl font-bold text-blue-600 mb-6">
-        Panel de Usuario
-      </h1>
-      <p className="text-lg mb-4">
-        👋 Bienvenido, {user.nombre || "Usuario"}.
+      <h1 className="text-3xl font-bold text-blue-600 mb-6">Panel de Usuario</h1>
+      <p className="mb-6 text-gray-600 dark:text-gray-300">
+        Sube videos o documentos para compartir con la comunidad.
       </p>
 
-      {/* === Progreso del usuario === */}
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">Tu progreso</h2>
-        {progreso.length === 0 ? (
-          <p>No tienes progreso registrado aún.</p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {progreso.map((p) => (
-              <div
-                key={p.id_progreso}
-                className="p-4 border rounded-lg shadow bg-gray-50 dark:bg-gray-800"
-              >
-                <h3 className="font-bold text-blue-600">{p.contenido}</h3>
-                <p className="text-sm">Progreso: {p.porcentaje_completado}%</p>
-                <p className="text-sm">
-                  Tiempo total: {(p.tiempo_total_segundos / 60).toFixed(1)} min
-                </p>
-                <p className="text-xs opacity-70">Estado: {p.estado}</p>
-              </div>
-            ))}
+      <form
+        onSubmit={handleSubir}
+        className="space-y-4 max-w-lg bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md"
+      >
+        <input
+          placeholder="Título"
+          className="w-full p-2 border rounded text-black"
+          value={nuevo.titulo}
+          onChange={(e) => setNuevo({ ...nuevo, titulo: e.target.value })}
+          required
+        />
+
+        <textarea
+          placeholder="Descripción"
+          className="w-full p-2 border rounded text-black"
+          value={nuevo.descripcion}
+          onChange={(e) => setNuevo({ ...nuevo, descripcion: e.target.value })}
+        />
+
+        <select
+          className="w-full p-2 border rounded text-black"
+          value={nuevo.tipo}
+          onChange={(e) => setNuevo({ ...nuevo, tipo: e.target.value })}
+        >
+          <option value="video">Video</option>
+          <option value="pdf">Documento PDF</option>
+          <option value="curso">Curso</option>
+        </select>
+
+        <input
+          type="file"
+          accept="video/mp4,application/pdf"
+          onChange={(e) => setArchivo(e.target.files?.[0] || null)}
+          className="w-full p-2 border rounded text-black"
+        />
+
+        {uploadProgress > 0 && (
+          <div className="w-full bg-gray-300 rounded mt-2">
+            <div
+              className="bg-blue-600 text-xs text-white text-center rounded"
+              style={{ width: `${uploadProgress}%` }}
+            >
+              {uploadProgress}%
+            </div>
           </div>
         )}
-      </section>
 
-      {/* === Contenidos subidos === */}
-      <section className="mb-10">
-        <h2 className="text-2xl font-semibold mb-4">
-          Tus contenidos subidos
-        </h2>
-        {contenidos.length === 0 ? (
-          <p>No has subido contenido todavía.</p>
-        ) : (
-          <ul className="space-y-3">
-            {contenidos.map((c) => (
-              <li
-                key={c.id_contenido}
-                className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow"
-              >
-                <h3 className="font-bold text-blue-600">{c.titulo}</h3>
-                <p className="text-sm opacity-80">{c.descripcion}</p>
-                <p className="text-xs">Estado: {c.estado}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* === Subir nuevo contenido === */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Subir nuevo contenido</h2>
-        <form onSubmit={handleSubir} className="space-y-4 max-w-xl">
-          <input
-            placeholder="Título"
-            className="w-full p-2 border rounded text-black"
-            value={nuevo.titulo}
-            onChange={(e) => setNuevo({ ...nuevo, titulo: e.target.value })}
-          />
-          <textarea
-            placeholder="Descripción"
-            className="w-full p-2 border rounded text-black"
-            value={nuevo.descripcion}
-            onChange={(e) =>
-              setNuevo({ ...nuevo, descripcion: e.target.value })
-            }
-          />
-          <select
-            className="w-full p-2 border rounded text-black"
-            value={nuevo.tipo}
-            onChange={(e) => setNuevo({ ...nuevo, tipo: e.target.value })}
-          >
-            <option value="video">Video</option>
-            <option value="pdf">Documento PDF</option>
-            <option value="curso">Curso</option>
-          </select>
-          <input
-            placeholder="URL del contenido"
-            className="w-full p-2 border rounded text-black"
-            value={nuevo.url_contenido}
-            onChange={(e) =>
-              setNuevo({ ...nuevo, url_contenido: e.target.value })
-            }
-          />
-          <button
-            type="submit"
-            className="btn w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
-          >
-            Enviar contenido
-          </button>
-        </form>
-      </section>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition"
+        >
+          Enviar contenido
+        </button>
+      </form>
     </div>
   );
 };

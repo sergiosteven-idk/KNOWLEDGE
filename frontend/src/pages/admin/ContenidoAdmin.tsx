@@ -1,8 +1,5 @@
-// ==============================
-// 🧑‍💼 GESTIÓN DE CONTENIDO — PANEL ADMIN
-// ==============================
 import React, { useEffect, useState } from "react";
-import api from "../../services/api";
+import api, { eliminarContenido } from "../../services/api";
 import { useAccessibility } from "../../contexts/AccessibilityContext";
 
 const ContenidoAdmin = () => {
@@ -10,13 +7,13 @@ const ContenidoAdmin = () => {
   const [contenidos, setContenidos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Cargar todos los contenidos al iniciar
   const fetchData = async () => {
+    setLoading(true);
     try {
       const res = await api.get("/admin/contenido");
       setContenidos(res.data);
     } catch (error) {
-      console.error("❌ Error al cargar contenidos:", error);
+      console.error("Error al cargar contenidos:", error);
     } finally {
       setLoading(false);
     }
@@ -26,25 +23,20 @@ const ContenidoAdmin = () => {
     fetchData();
   }, []);
 
-  // ✅ Aprobar contenido
-  const aprobarContenido = async (id: number) => {
-    try {
-      await api.put(`/admin/contenido/${id}/aprobar`);
-      alert("✅ Contenido aprobado exitosamente.");
-      fetchData();
-    } catch (error) {
-      alert("❌ Error al aprobar contenido.");
-    }
+  const aprobar = async (id: number) => {
+    await api.put(`/admin/contenido/${id}/aprobar`);
+    fetchData();
   };
 
-  // ❌ Rechazar contenido
-  const rechazarContenido = async (id: number) => {
-    try {
-      await api.put(`/admin/contenido/${id}/rechazar`);
-      alert("❌ Contenido rechazado.");
+  const rechazar = async (id: number) => {
+    await api.put(`/admin/contenido/${id}/rechazar`);
+    fetchData();
+  };
+
+  const eliminar = async (id: number) => {
+    if (window.confirm("¿Seguro que deseas eliminar este contenido?")) {
+      await eliminarContenido(id);
       fetchData();
-    } catch (error) {
-      alert("⚠️ Error al rechazar contenido.");
     }
   };
 
@@ -59,15 +51,13 @@ const ContenidoAdmin = () => {
       }`}
     >
       <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center">
-        Gestión de Contenido Educativo
+        Gestión de Contenidos
       </h1>
 
       {loading ? (
         <p className="text-center">Cargando contenidos...</p>
       ) : contenidos.length === 0 ? (
-        <p className="text-center text-gray-500">
-          No hay contenidos registrados en el sistema.
-        </p>
+        <p className="text-center">No hay contenidos en el sistema.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300 text-sm">
@@ -77,6 +67,7 @@ const ContenidoAdmin = () => {
                 <th className="p-3 border">Tipo</th>
                 <th className="p-3 border">Estado</th>
                 <th className="p-3 border">Nivel</th>
+                <th className="p-3 border">Fecha publicación</th>
                 <th className="p-3 border">Acciones</th>
               </tr>
             </thead>
@@ -86,47 +77,46 @@ const ContenidoAdmin = () => {
                   key={c.id_contenido}
                   className="text-center bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                 >
-                  <td className="p-2 border font-semibold text-blue-700 dark:text-blue-300">
-                    {c.titulo}
-                  </td>
-                  <td className="p-2 border capitalize">{c.tipo}</td>
+                  <td className="p-2 border">{c.titulo}</td>
+                  <td className="p-2 border capitalize">{c.tipo || "—"}</td>
                   <td
                     className={`p-2 border font-semibold ${
                       c.estado === "aprobado"
                         ? "text-green-600"
                         : c.estado === "rechazado"
                         ? "text-red-600"
-                        : "text-yellow-500"
+                        : "text-yellow-600"
                     }`}
                   >
-                    {c.estado.toUpperCase()}
+                    {c.estado || "pendiente"}
                   </td>
-                  <td className="p-2 border">{c.nivel_dificultad}</td>
-                  <td className="p-2 border">
-                    {c.estado === "pendiente" ? (
+                  <td className="p-2 border">{c.nivel_dificultad || "—"}</td>
+                  <td className="p-2 border text-xs">
+                    {c.fecha_publicacion || "—"}
+                  </td>
+                  <td className="p-2 border space-x-2">
+                    {c.estado !== "aprobado" && (
                       <>
                         <button
-                          onClick={() => aprobarContenido(c.id_contenido)}
-                          className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-lg mr-2 transition"
+                          onClick={() => aprobar(c.id_contenido)}
+                          className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-lg"
                         >
                           Aprobar
                         </button>
                         <button
-                          onClick={() => rechazarContenido(c.id_contenido)}
-                          className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg transition"
+                          onClick={() => rechazar(c.id_contenido)}
+                          className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg"
                         >
                           Rechazar
                         </button>
                       </>
-                    ) : (
-                      <span className="italic text-gray-500">
-                        {c.estado === "aprobado"
-                          ? "✔ Aprobado"
-                          : c.estado === "rechazado"
-                          ? "✖ Rechazado"
-                          : "—"}
-                      </span>
                     )}
+                    <button
+                      onClick={() => eliminar(c.id_contenido)}
+                      className="bg-gray-700 hover:bg-gray-800 text-white py-1 px-3 rounded-lg"
+                    >
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               ))}

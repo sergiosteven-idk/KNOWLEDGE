@@ -1,15 +1,15 @@
 // ==============================
-// 🌐 API SERVICE — KNOWLEDGE
+// 🌐 API SERVICE — KNOWLEDGE FRONTEND
 // ==============================
 
 import axios from "axios";
 
-// 🔗 Instancia base de Axios
+// Instancia base de Axios
 const api = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
-// 🔒 Interceptor para enviar token en cada request
+// 🔒 Enviar token en cada request si existe
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -17,20 +17,24 @@ api.interceptors.request.use((config) => {
 });
 
 // ==============================
-// 📊 HELPERS — llamados reutilizables
+// 📡 ENDPOINTS REUTILIZABLES
 // ==============================
 
-// Obtener progreso del usuario
-export const obtenerProgreso = async (userId, token) => {
-  const res = await api.get(`/progreso/${userId}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+// Subir contenido (con archivo)
+export const subirContenido = async (formData, setProgress) => {
+  const res = await api.post("/contenido", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress: (e) => {
+      const progress = Math.round((e.loaded * 100) / e.total);
+      if (setProgress) setProgress(progress);
+    },
   });
   return res.data;
 };
 
-// Subir contenido (usuario)
-export const subirContenido = async (payload) => {
-  const res = await api.post("/contenido", payload);
+// Obtener progreso del usuario
+export const obtenerProgreso = async (userId) => {
+  const res = await api.get(`/progreso/${userId}`);
   return res.data;
 };
 
@@ -40,21 +44,15 @@ export const obtenerContenidoUsuario = async (userId) => {
   return res.data;
 };
 
-// Obtener eventos
-export const obtenerEventos = async () => {
-  const res = await api.get("/eventos");
+// Feed público (contenidos aprobados)
+export const obtenerFeed = async () => {
+  const res = await api.get("/contenido/aprobados");
   return res.data;
 };
 
-// Crear donación
-export const crearDonacion = async (payload) => {
-  const res = await api.post("/donaciones", payload);
-  return res.data;
-};
-
-// Enviar feedback
-export const enviarFeedback = async (payload) => {
-  const res = await api.post("/feedback", payload);
+// Admin: eliminar contenido
+export const eliminarContenido = async (id) => {
+  const res = await api.delete(`/admin/contenido/${id}`);
   return res.data;
 };
 

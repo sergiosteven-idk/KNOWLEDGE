@@ -1,47 +1,23 @@
+// ==============================
+// 🧑‍💼 ADMIN CONTROLLER — KNOWLEDGE
+// ==============================
 const db = require("../config/db");
 
-// 🧑‍💼 Obtener todos los usuarios
-exports.obtenerUsuarios = async (req, res) => {
-  try {
-    const [rows] = await db.query(
-      "SELECT id_usuario, nombre, apellido, correo, tipo_usuario, activo, fecha_registro FROM Miembro ORDER BY fecha_registro DESC"
-    );
-    res.json(rows);
-  } catch (error) {
-    console.error("❌ Error al obtener usuarios:", error);
-    res.status(500).json({ message: "Error al obtener usuarios" });
-  }
-};
-
-// 🧱 Obtener todos los contenidos educativos
+// 📚 Obtener todos los contenidos con detalles
 exports.obtenerContenidos = async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT id_contenido, titulo, tipo, estado, nivel_dificultad, fecha_publicacion
-       FROM ContenidoEducativo ORDER BY fecha_publicacion DESC`
+      `SELECT id_contenido, titulo, tipo,
+              IFNULL(estado, 'pendiente') AS estado,
+              nivel_dificultad,
+              DATE_FORMAT(fecha_publicacion, '%Y-%m-%d %H:%i:%s') AS fecha_publicacion
+       FROM ContenidoEducativo
+       ORDER BY fecha_publicacion DESC`
     );
     res.json(rows);
   } catch (error) {
-    console.error("❌ Error al obtener contenido:", error);
-    res.status(500).json({ message: "Error al obtener contenido" });
-  }
-};
-
-// 📊 Estadísticas generales
-exports.obtenerEstadisticas = async (req, res) => {
-  try {
-    const [[usuarios]] = await db.query("SELECT COUNT(*) AS total_usuarios FROM Miembro");
-    const [[contenidos]] = await db.query("SELECT COUNT(*) AS total_contenidos FROM ContenidoEducativo");
-    const [[progreso]] = await db.query("SELECT AVG(porcentaje_completado) AS promedio_progreso FROM Progreso");
-
-    res.json({
-      total_usuarios: usuarios.total_usuarios,
-      total_contenidos: contenidos.total_contenidos,
-      promedio_progreso: progreso.promedio_progreso ? parseFloat(progreso.promedio_progreso).toFixed(2) : 0,
-    });
-  } catch (error) {
-    console.error("❌ Error al obtener estadísticas:", error);
-    res.status(500).json({ message: "Error al obtener estadísticas" });
+    console.error("❌ Error al obtener contenidos:", error);
+    res.status(500).json({ message: "Error al obtener contenidos." });
   }
 };
 
@@ -50,17 +26,15 @@ exports.aprobarContenido = async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query(
-      'UPDATE ContenidoEducativo SET estado = "aprobado" WHERE id_contenido = ?',
+      "UPDATE ContenidoEducativo SET estado = 'aprobado', fecha_publicacion = NOW() WHERE id_contenido = ?",
       [id]
     );
-
-    if (rows.affectedRows === 0)
+    if (!rows.affectedRows)
       return res.status(404).json({ message: "Contenido no encontrado" });
-
-    res.json({ message: "✅ Contenido aprobado exitosamente." });
+    res.json({ message: "✅ Contenido aprobado correctamente." });
   } catch (error) {
     console.error("❌ Error al aprobar contenido:", error);
-    res.status(500).json({ message: "Error al aprobar contenido" });
+    res.status(500).json({ message: "Error al aprobar contenido." });
   }
 };
 
@@ -69,16 +43,66 @@ exports.rechazarContenido = async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query(
-      'UPDATE ContenidoEducativo SET estado = "rechazado" WHERE id_contenido = ?',
+      "UPDATE ContenidoEducativo SET estado = 'rechazado' WHERE id_contenido = ?",
       [id]
     );
-
-    if (rows.affectedRows === 0)
+    if (!rows.affectedRows)
       return res.status(404).json({ message: "Contenido no encontrado" });
-
-    res.json({ message: "❌ Contenido rechazado exitosamente." });
+    res.json({ message: "❌ Contenido rechazado correctamente." });
   } catch (error) {
     console.error("❌ Error al rechazar contenido:", error);
-    res.status(500).json({ message: "Error al rechazar contenido" });
+    res.status(500).json({ message: "Error al rechazar contenido." });
+  }
+};
+
+// 🗑️ Eliminar contenido
+exports.eliminarContenido = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.query(
+      "DELETE FROM ContenidoEducativo WHERE id_contenido = ?",
+      [id]
+    );
+    if (!rows.affectedRows)
+      return res.status(404).json({ message: "Contenido no encontrado" });
+    res.json({ message: "🗑️ Contenido eliminado correctamente." });
+  } catch (error) {
+    console.error("❌ Error al eliminar contenido:", error);
+    res.status(500).json({ message: "Error al eliminar contenido." });
+  }
+};
+
+// 👥 Obtener usuarios registrados
+exports.obtenerUsuarios = async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT id_usuario, CONCAT(nombre, ' ', apellido) AS nombre_completo, correo, tipo_usuario, fecha_registro
+       FROM Usuario
+       ORDER BY fecha_registro DESC`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("❌ Error al obtener usuarios:", error);
+    res.status(500).json({ message: "Error al obtener usuarios." });
+  }
+};
+
+// 📊 Obtener estadísticas del sistema
+exports.obtenerEstadisticas = async (req, res) => {
+  try {
+    const [[usuarios]] = await db.query("SELECT COUNT(*) AS total_usuarios FROM Usuario");
+    const [[contenidos]] = await db.query("SELECT COUNT(*) AS total_contenidos FROM ContenidoEducativo");
+    const [[promedio]] = await db.query(
+      "SELECT IFNULL(AVG(porcentaje_completado), 0) AS promedio_progreso FROM Progreso"
+    );
+
+    res.json({
+      usuarios: usuarios.total_usuarios,
+      contenidos: contenidos.total_contenidos,
+      promedio_progreso: promedio.promedio_progreso.toFixed(1),
+    });
+  } catch (error) {
+    console.error("❌ Error al obtener estadísticas:", error);
+    res.status(500).json({ message: "Error al obtener estadísticas." });
   }
 };
