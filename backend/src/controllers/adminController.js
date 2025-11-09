@@ -7,10 +7,14 @@ const db = require("../config/db");
 exports.obtenerContenidos = async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT id_contenido, titulo, tipo,
-              IFNULL(estado, 'pendiente') AS estado,
-              nivel_dificultad,
-              DATE_FORMAT(fecha_publicacion, '%Y-%m-%d %H:%i:%s') AS fecha_publicacion
+      `SELECT 
+         id_contenido,
+         titulo,
+         tipo,
+         /* normalizamos posibles 'borrador' o NULL a 'pendiente' */
+         CASE WHEN estado IS NULL OR estado='borrador' THEN 'pendiente' ELSE estado END AS estado,
+         nivel_dificultad,
+         DATE_FORMAT(fecha_publicacion, '%Y-%m-%d %H:%i:%s') AS fecha_publicacion
        FROM ContenidoEducativo
        ORDER BY fecha_publicacion DESC`
     );
@@ -26,11 +30,10 @@ exports.aprobarContenido = async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query(
-      "UPDATE ContenidoEducativo SET estado = 'aprobado', fecha_publicacion = NOW() WHERE id_contenido = ?",
+      "UPDATE ContenidoEducativo SET estado='aprobado', fecha_publicacion=NOW() WHERE id_contenido=?",
       [id]
     );
-    if (!rows.affectedRows)
-      return res.status(404).json({ message: "Contenido no encontrado" });
+    if (!rows.affectedRows) return res.status(404).json({ message: "Contenido no encontrado" });
     res.json({ message: "✅ Contenido aprobado correctamente." });
   } catch (error) {
     console.error("❌ Error al aprobar contenido:", error);
@@ -43,11 +46,10 @@ exports.rechazarContenido = async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query(
-      "UPDATE ContenidoEducativo SET estado = 'rechazado' WHERE id_contenido = ?",
+      "UPDATE ContenidoEducativo SET estado='rechazado' WHERE id_contenido=?",
       [id]
     );
-    if (!rows.affectedRows)
-      return res.status(404).json({ message: "Contenido no encontrado" });
+    if (!rows.affectedRows) return res.status(404).json({ message: "Contenido no encontrado" });
     res.json({ message: "❌ Contenido rechazado correctamente." });
   } catch (error) {
     console.error("❌ Error al rechazar contenido:", error);
@@ -59,12 +61,8 @@ exports.rechazarContenido = async (req, res) => {
 exports.eliminarContenido = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await db.query(
-      "DELETE FROM ContenidoEducativo WHERE id_contenido = ?",
-      [id]
-    );
-    if (!rows.affectedRows)
-      return res.status(404).json({ message: "Contenido no encontrado" });
+    const [rows] = await db.query("DELETE FROM ContenidoEducativo WHERE id_contenido=?", [id]);
+    if (!rows.affectedRows) return res.status(404).json({ message: "Contenido no encontrado" });
     res.json({ message: "🗑️ Contenido eliminado correctamente." });
   } catch (error) {
     console.error("❌ Error al eliminar contenido:", error);
@@ -76,8 +74,14 @@ exports.eliminarContenido = async (req, res) => {
 exports.obtenerUsuarios = async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT id_usuario, CONCAT(nombre, ' ', apellido) AS nombre_completo, correo, tipo_usuario, fecha_registro
-       FROM Usuario
+      `SELECT 
+         id_usuario,
+         CONCAT(nombre, ' ', apellido) AS nombre_completo,
+         correo,
+         tipo_usuario,
+         activo,
+         fecha_registro
+       FROM Miembro
        ORDER BY fecha_registro DESC`
     );
     res.json(rows);
@@ -90,16 +94,16 @@ exports.obtenerUsuarios = async (req, res) => {
 // 📊 Obtener estadísticas del sistema
 exports.obtenerEstadisticas = async (req, res) => {
   try {
-    const [[usuarios]] = await db.query("SELECT COUNT(*) AS total_usuarios FROM Usuario");
-    const [[contenidos]] = await db.query("SELECT COUNT(*) AS total_contenidos FROM ContenidoEducativo");
+    const [[usuarios]] = await db.query("SELECT COUNT(*) AS usuarios FROM Miembro");
+    const [[contenidos]] = await db.query("SELECT COUNT(*) AS contenidos FROM ContenidoEducativo");
     const [[promedio]] = await db.query(
-      "SELECT IFNULL(AVG(porcentaje_completado), 0) AS promedio_progreso FROM Progreso"
+      "SELECT IFNULL(AVG(porcentaje_completado),0) AS promedio_progreso FROM Progreso"
     );
 
     res.json({
-      usuarios: usuarios.total_usuarios,
-      contenidos: contenidos.total_contenidos,
-      promedio_progreso: promedio.promedio_progreso.toFixed(1),
+      usuarios: usuarios.usuarios,
+      contenidos: contenidos.contenidos,
+      promedio_progreso: Number(promedio.promedio_progreso).toFixed(1),
     });
   } catch (error) {
     console.error("❌ Error al obtener estadísticas:", error);

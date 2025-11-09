@@ -4,30 +4,28 @@
 import React, { useEffect, useState } from "react";
 import api from "../../services/api";
 import ContenidoAdmin from "./ContenidoAdmin";
+import UsuariosAdmin from "./UsuariosAdmin";
 import { useAccessibility } from "../../contexts/AccessibilityContext";
 
 const AdminDashboard = () => {
   const { darkMode, highContrast } = useAccessibility();
-  const [view, setView] = useState("usuarios");
-  const [usuarios, setUsuarios] = useState<any[]>([]);
-  const [estadisticas, setEstadisticas] = useState<any>({});
-  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<"usuarios" | "contenido" | "estadisticas">("usuarios");
+  const [estadisticas, setEstadisticas] = useState<any>({ usuarios: 0, contenidos: 0, promedio_progreso: 0 });
+  const [loadingStats, setLoadingStats] = useState(true);
 
-  // Cargar datos del panel
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStats = async () => {
       try {
-        const resUsuarios = await api.get("/admin/usuarios");
-        const resStats = await api.get("/admin/estadisticas");
-        setUsuarios(resUsuarios.data);
-        setEstadisticas(resStats.data);
+        const res = await api.get("/admin/estadisticas");
+        // Backend devuelve { usuarios, contenidos, promedio_progreso }
+        setEstadisticas(res.data);
       } catch (error) {
-        console.error("❌ Error al cargar datos del panel admin:", error);
+        console.error("❌ Error al cargar estadísticas:", error);
       } finally {
-        setLoading(false);
+        setLoadingStats(false);
       }
     };
-    fetchData();
+    fetchStats();
   }, []);
 
   return (
@@ -49,9 +47,7 @@ const AdminDashboard = () => {
         <button
           onClick={() => setView("usuarios")}
           className={`px-4 py-2 rounded-lg transition ${
-            view === "usuarios"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 dark:bg-gray-700"
+            view === "usuarios" ? "bg-blue-600 text-white" : "bg-gray-200 dark:bg-gray-700"
           }`}
         >
           👥 Usuarios
@@ -59,9 +55,7 @@ const AdminDashboard = () => {
         <button
           onClick={() => setView("contenido")}
           className={`px-4 py-2 rounded-lg transition ${
-            view === "contenido"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 dark:bg-gray-700"
+            view === "contenido" ? "bg-blue-600 text-white" : "bg-gray-200 dark:bg-gray-700"
           }`}
         >
           📚 Contenido
@@ -69,103 +63,38 @@ const AdminDashboard = () => {
         <button
           onClick={() => setView("estadisticas")}
           className={`px-4 py-2 rounded-lg transition ${
-            view === "estadisticas"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 dark:bg-gray-700"
+            view === "estadisticas" ? "bg-blue-600 text-white" : "bg-gray-200 dark:bg-gray-700"
           }`}
         >
           📊 Estadísticas
         </button>
       </div>
 
-      {loading ? (
-        <p className="text-center">Cargando datos...</p>
-      ) : (
-        <>
-          {/* ============================== */}
-          {/* 👥 SECCIÓN: USUARIOS */}
-          {/* ============================== */}
-          {view === "usuarios" && (
-            <section className="overflow-x-auto">
-              <h2 className="text-2xl font-semibold mb-4 text-blue-500">
-                Lista de Usuarios
-              </h2>
-              {usuarios.length === 0 ? (
-                <p>No hay usuarios registrados.</p>
-              ) : (
-                <table className="w-full border-collapse border border-gray-300 text-sm">
-                  <thead className="bg-blue-600 text-white">
-                    <tr>
-                      <th className="p-3 border">Nombre</th>
-                      <th className="p-3 border">Correo</th>
-                      <th className="p-3 border">Rol</th>
-                      <th className="p-3 border">Activo</th>
-                      <th className="p-3 border">Fecha registro</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {usuarios.map((u) => (
-                      <tr
-                        key={u.id_usuario}
-                        className="text-center bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-                      >
-                        <td className="p-2 border font-semibold">{u.nombre} {u.apellido}</td>
-                        <td className="p-2 border">{u.correo}</td>
-                        <td className="p-2 border capitalize">{u.tipo_usuario}</td>
-                        <td className="p-2 border">
-                          {u.activo ? (
-                            <span className="text-green-600 font-semibold">Activo</span>
-                          ) : (
-                            <span className="text-red-600 font-semibold">Inactivo</span>
-                          )}
-                        </td>
-                        <td className="p-2 border text-sm opacity-80">
-                          {new Date(u.fecha_registro).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </section>
-          )}
+      {view === "usuarios" && <UsuariosAdmin />}
+      {view === "contenido" && <ContenidoAdmin />}
 
-          {/* ============================== */}
-          {/* 📚 SECCIÓN: CONTENIDO */}
-          {/* ============================== */}
-          {view === "contenido" && (
-            <section>
-              <ContenidoAdmin />
-            </section>
-          )}
-
-          {/* ============================== */}
-          {/* 📊 SECCIÓN: ESTADÍSTICAS */}
-          {/* ============================== */}
-          {view === "estadisticas" && (
-            <section className="mt-6">
-              <h2 className="text-2xl font-semibold mb-4 text-blue-500">
-                Estadísticas del Sistema
-              </h2>
-              <div className="grid sm:grid-cols-3 gap-4 text-center">
-                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
-                  <h3 className="text-lg font-bold text-blue-600">Usuarios</h3>
-                  <p className="text-3xl font-bold mt-2">{estadisticas.total_usuarios}</p>
-                </div>
-                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
-                  <h3 className="text-lg font-bold text-blue-600">Contenidos</h3>
-                  <p className="text-3xl font-bold mt-2">{estadisticas.total_contenidos}</p>
-                </div>
-                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
-                  <h3 className="text-lg font-bold text-blue-600">Promedio progreso</h3>
-                  <p className="text-3xl font-bold mt-2">
-                    {estadisticas.promedio_progreso || 0}%
-                  </p>
-                </div>
+      {view === "estadisticas" && (
+        <section className="mt-6">
+          <h2 className="text-2xl font-semibold mb-4 text-blue-500">Estadísticas del Sistema</h2>
+          {loadingStats ? (
+            <p className="text-center">Cargando datos...</p>
+          ) : (
+            <div className="grid sm:grid-cols-3 gap-4 text-center">
+              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
+                <h3 className="text-lg font-bold text-blue-600">Usuarios</h3>
+                <p className="text-3xl font-bold mt-2">{estadisticas.usuarios}</p>
               </div>
-            </section>
+              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
+                <h3 className="text-lg font-bold text-blue-600">Contenidos</h3>
+                <p className="text-3xl font-bold mt-2">{estadisticas.contenidos}</p>
+              </div>
+              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
+                <h3 className="text-lg font-bold text-blue-600">Promedio progreso</h3>
+                <p className="text-3xl font-bold mt-2">{estadisticas.promedio_progreso}%</p>
+              </div>
+            </div>
           )}
-        </>
+        </section>
       )}
     </div>
   );
