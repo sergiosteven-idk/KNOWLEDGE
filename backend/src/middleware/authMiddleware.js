@@ -1,21 +1,18 @@
-// src/middleware/authMiddleware.js
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Token no proporcionado' });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token no proporcionado" });
   }
 
-  const token = authHeader.split(' ')[1];
-
+  const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Guarda info del usuario en req
+    req.user = decoded;
     next();
-  } catch (error) {
-    return res.status(403).json({ message: 'Token inválido o expirado' });
+  } catch {
+    return res.status(403).json({ message: "Token inválido o expirado" });
   }
 };

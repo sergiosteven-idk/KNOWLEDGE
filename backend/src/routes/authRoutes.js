@@ -1,9 +1,18 @@
-// src/routes/authRoutes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
+const auth = require("../middleware/authMiddleware");
+const {
+  register,
+  login,
+  obtenerPerfil,
+  actualizarPerfil,
+} = require("../controllers/authController");
 
-router.post('/register', register);
-router.post('/login', login);
+router.post("/register", register);
+router.post("/login", login);
+
+// 👤 Perfil
+router.get("/me/:id", auth, obtenerPerfil);
+router.put("/update/:id", auth, actualizarPerfil);
 
 module.exports = router;

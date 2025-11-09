@@ -1,118 +1,169 @@
 // ==============================
-// 📊 DASHBOARD DE PROGRESO (ACCESIBLE)
+// 📊 DASHBOARD DE USUARIO — KNOWLEDGE
 // ==============================
+import React, { useEffect, useState } from "react";
+import { obtenerProgreso, obtenerContenidoUsuario, subirContenido } from "../services/api";
+import { useAccessibility } from "../contexts/AccessibilityContext";
 
-import React, { useEffect, useState } from 'react';
-import { obtenerProgreso } from '../services/api';
-import { useAccessibility } from '../contexts/AccessibilityContext';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid
-} from 'recharts';
-
-interface Progreso {
-  id_progreso: number;
-  tipo_progreso: string;
-  porcentaje_completado: number;
-  tiempo_total_segundos: number;
-  estado: string;
-  contenido: string;
-  tipo_contenido: string;
-}
-
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const { highContrast, darkMode } = useAccessibility();
-  const [progreso, setProgreso] = useState<Progreso[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem('token') || '';
-  const userId = 2; // 👈 puedes enlazarlo con tu auth en el futuro
+  const [progreso, setProgreso] = useState<any[]>([]);
+  const [contenidos, setContenidos] = useState<any[]>([]);
+  const [nuevo, setNuevo] = useState({
+    titulo: "",
+    descripcion: "",
+    tipo: "video",
+    url_contenido: "",
+    nivel_dificultad: "principiante",
+  });
 
+  const user = JSON.parse(localStorage.getItem("usuario") || "{}");
+  const token = localStorage.getItem("token") || "";
+
+  // Cargar progreso y contenido del usuario
   useEffect(() => {
-    const fetchData = async () => {
+    const cargarDatos = async () => {
       try {
-        const data = await obtenerProgreso(userId, token);
-        // Convierte valores de texto a número si es necesario
-        const parsed = data.map((p: any) => ({
-          ...p,
-          porcentaje_completado: parseFloat(p.porcentaje_completado),
-        }));
-        setProgreso(parsed);
-      } catch (error) {
-        console.error('Error al cargar progreso:', error);
-      } finally {
-        setLoading(false);
+        const dataProgreso = await obtenerProgreso(user.id, token);
+        setProgreso(dataProgreso);
+
+        const dataContenidos = await obtenerContenidoUsuario(user.id);
+        setContenidos(dataContenidos);
+      } catch (err) {
+        console.error("❌ Error al cargar datos del dashboard:", err);
       }
     };
-    fetchData();
+    cargarDatos();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Cargando progreso...</p>;
+  // Subir contenido nuevo
+  const handleSubir = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await subirContenido({ ...nuevo, id_autor: user.id });
+      alert("✅ Contenido enviado para revisión.");
+      setNuevo({
+        titulo: "",
+        descripcion: "",
+        tipo: "video",
+        url_contenido: "",
+        nivel_dificultad: "principiante",
+      });
+      const dataContenidos = await obtenerContenidoUsuario(user.id);
+      setContenidos(dataContenidos);
+    } catch (error) {
+      alert("❌ Error al subir contenido.");
+    }
+  };
 
   return (
     <div
       className={`min-h-screen p-8 transition ${
         highContrast
-          ? 'bg-yellow-50 text-black'
+          ? "bg-yellow-50 text-black"
           : darkMode
-          ? 'bg-gray-900 text-white'
-          : 'bg-white text-gray-800'
+          ? "bg-gray-900 text-white"
+          : "bg-white text-gray-800"
       }`}
     >
-      <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center">
-        Tu progreso de aprendizaje
+      <h1 className="text-3xl font-bold text-blue-600 mb-6">
+        Panel de Usuario
       </h1>
+      <p className="text-lg mb-4">
+        👋 Bienvenido, {user.nombre || "Usuario"}.
+      </p>
 
-      {progreso.length === 0 ? (
-        <p className="text-center text-gray-600">No tienes progreso registrado aún.</p>
-      ) : (
-        <div className="max-w-4xl mx-auto">
-          {/* 🟦 Tarjetas individuales */}
-          <div className="grid gap-4 sm:grid-cols-2 mb-10">
-            {progreso.map((item) => (
+      {/* === Progreso del usuario === */}
+      <section className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4">Tu progreso</h2>
+        {progreso.length === 0 ? (
+          <p>No tienes progreso registrado aún.</p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {progreso.map((p) => (
               <div
-                key={item.id_progreso}
-                className={`p-4 rounded-xl shadow-lg border ${
-                  highContrast ? 'bg-yellow-100 border-black' : 'bg-gray-50 border-gray-200'
-                }`}
+                key={p.id_progreso}
+                className="p-4 border rounded-lg shadow bg-gray-50 dark:bg-gray-800"
               >
-                <h2 className="text-lg font-semibold text-blue-700">
-                  {item.contenido}
-                </h2>
-                <p className="text-sm text-gray-600 mb-2">{item.tipo_contenido}</p>
-                <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-                  <div
-                    className="bg-blue-600 h-4 rounded-full transition-all"
-                    style={{ width: `${item.porcentaje_completado}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm">Progreso: {item.porcentaje_completado}%</p>
-                <p className="text-sm">Tiempo total: {(item.tiempo_total_segundos / 60).toFixed(1)} min</p>
-                <p className="text-sm">Estado: {item.estado}</p>
+                <h3 className="font-bold text-blue-600">{p.contenido}</h3>
+                <p className="text-sm">Progreso: {p.porcentaje_completado}%</p>
+                <p className="text-sm">
+                  Tiempo total: {(p.tiempo_total_segundos / 60).toFixed(1)} min
+                </p>
+                <p className="text-xs opacity-70">Estado: {p.estado}</p>
               </div>
             ))}
           </div>
+        )}
+      </section>
 
-          {/* 📊 Gráfico de barras */}
-          <h2 className="text-xl font-semibold text-center mb-4">Resumen visual</h2>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={progreso}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="contenido" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Bar dataKey="porcentaje_completado" fill="#3B82F6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
+      {/* === Contenidos subidos === */}
+      <section className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4">
+          Tus contenidos subidos
+        </h2>
+        {contenidos.length === 0 ? (
+          <p>No has subido contenido todavía.</p>
+        ) : (
+          <ul className="space-y-3">
+            {contenidos.map((c) => (
+              <li
+                key={c.id_contenido}
+                className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow"
+              >
+                <h3 className="font-bold text-blue-600">{c.titulo}</h3>
+                <p className="text-sm opacity-80">{c.descripcion}</p>
+                <p className="text-xs">Estado: {c.estado}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* === Subir nuevo contenido === */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Subir nuevo contenido</h2>
+        <form onSubmit={handleSubir} className="space-y-4 max-w-xl">
+          <input
+            placeholder="Título"
+            className="w-full p-2 border rounded text-black"
+            value={nuevo.titulo}
+            onChange={(e) => setNuevo({ ...nuevo, titulo: e.target.value })}
+          />
+          <textarea
+            placeholder="Descripción"
+            className="w-full p-2 border rounded text-black"
+            value={nuevo.descripcion}
+            onChange={(e) =>
+              setNuevo({ ...nuevo, descripcion: e.target.value })
+            }
+          />
+          <select
+            className="w-full p-2 border rounded text-black"
+            value={nuevo.tipo}
+            onChange={(e) => setNuevo({ ...nuevo, tipo: e.target.value })}
+          >
+            <option value="video">Video</option>
+            <option value="pdf">Documento PDF</option>
+            <option value="curso">Curso</option>
+          </select>
+          <input
+            placeholder="URL del contenido"
+            className="w-full p-2 border rounded text-black"
+            value={nuevo.url_contenido}
+            onChange={(e) =>
+              setNuevo({ ...nuevo, url_contenido: e.target.value })
+            }
+          />
+          <button
+            type="submit"
+            className="btn w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
+          >
+            Enviar contenido
+          </button>
+        </form>
+      </section>
     </div>
   );
 };

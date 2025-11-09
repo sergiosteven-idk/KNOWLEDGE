@@ -1,60 +1,65 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+// ==============================
+// ♿ CONTEXTO DE ACCESIBILIDAD — KNOWLEDGE
+// ==============================
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-interface AccessibilitySettings {
-  highContrast: boolean;
-  fontSize: number; // 1 = normal, 1.25 = grande, etc.
+interface AccessibilityContextType {
   darkMode: boolean;
+  highContrast: boolean;
   ttsEnabled: boolean;
-  toggleContrast: () => void;
   toggleDarkMode: () => void;
-  increaseFont: () => void;
-  decreaseFont: () => void;
+  toggleContrast: () => void;
   toggleTTS: () => void;
 }
 
-const AccessibilityContext = createContext<AccessibilitySettings | undefined>(undefined);
+const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
 
-export const AccessibilityProvider = ({ children }: { children: ReactNode }) => {
-  const [highContrast, setHighContrast] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [ttsEnabled, setTtsEnabled] = useState(false);
-  const [fontSize, setFontSize] = useState(1);
+export const AccessibilityProvider = ({ children }: { children: React.ReactNode }) => {
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
+  const [highContrast, setHighContrast] = useState(() => localStorage.getItem("highContrast") === "true");
+  const [ttsEnabled, setTTSEnabled] = useState(() => localStorage.getItem("ttsEnabled") === "true");
 
-  const toggleContrast = () => setHighContrast(!highContrast);
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-  const toggleTTS = () => setTtsEnabled(!ttsEnabled);
-  const increaseFont = () => setFontSize((f) => Math.min(f + 0.25, 2));
-  const decreaseFont = () => setFontSize((f) => Math.max(f - 0.25, 0.75));
-
-  const value: AccessibilitySettings = {
-    highContrast,
-    fontSize,
-    darkMode,
-    ttsEnabled,
-    toggleContrast,
-    toggleDarkMode,
-    increaseFont,
-    decreaseFont,
-    toggleTTS
+  // 🌙 Alternar modo oscuro
+  const toggleDarkMode = () => {
+    const newValue = !darkMode;
+    setDarkMode(newValue);
+    localStorage.setItem("darkMode", String(newValue));
   };
 
-  return (
-    <AccessibilityContext.Provider value={value}>
-      <div
-        className={`
-          ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}
-          ${highContrast ? 'contrast-200' : ''}
-        `}
-        style={{ fontSize: `${fontSize}em`, minHeight: '100vh' }}
-      >
-        {children}
-      </div>
-    </AccessibilityContext.Provider>
-  );
+  // 🟨 Alternar contraste alto
+  const toggleContrast = () => {
+    const newValue = !highContrast;
+    setHighContrast(newValue);
+    localStorage.setItem("highContrast", String(newValue));
+  };
+
+  // 🗣️ Alternar lector de voz
+  const toggleTTS = () => {
+    const newValue = !ttsEnabled;
+    setTTSEnabled(newValue);
+    localStorage.setItem("ttsEnabled", String(newValue));
+  };
+
+  // Aplicar modo oscuro al body
+  useEffect(() => {
+    document.body.classList.toggle("dark", darkMode);
+  }, [darkMode]);
+
+  const value = {
+    darkMode,
+    highContrast,
+    ttsEnabled,
+    toggleDarkMode,
+    toggleContrast,
+    toggleTTS,
+  };
+
+  return <AccessibilityContext.Provider value={value}>{children}</AccessibilityContext.Provider>;
 };
 
+// Hook personalizado para acceder al contexto
 export const useAccessibility = () => {
   const context = useContext(AccessibilityContext);
-  if (!context) throw new Error('useAccessibility must be used within AccessibilityProvider');
+  if (!context) throw new Error("useAccessibility debe usarse dentro de AccessibilityProvider");
   return context;
 };

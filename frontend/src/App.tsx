@@ -1,5 +1,5 @@
 // ==============================
-// 🌐 KNOWLEDGE FRONTEND APP (Rutas reales)
+// 🌐 KNOWLEDGE FRONTEND APP — RUTAS Y ACCESIBILIDAD
 // ==============================
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
@@ -12,44 +12,53 @@ import Donaciones from "./pages/community/Donaciones";
 import Feedback from "./pages/community/Feedback";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AccessibilityProvider, useAccessibility } from "./contexts/AccessibilityContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import AccessibilityPanel from "./components/accessibility/AccessibilityPanel";
 
-// Anuncia cambios de página con TTS si está activo y actualiza el título
+// ==============================
+// 🎧 TTS Announcer: anuncia cambios de página
+// ==============================
 const ScreenReaderAnnouncer = () => {
   const { ttsEnabled } = useAccessibility();
   const location = useLocation();
 
   useEffect(() => {
-    // Título por ruta
-    const map = {
+    const map: Record<string, string> = {
       "/": "Inicio – Knowledge",
       "/dashboard": "Panel de usuario – Knowledge",
       "/admin": "Administración – Knowledge",
       "/eventos": "Eventos – Knowledge",
       "/donaciones": "Donaciones – Knowledge",
       "/feedback": "Feedback – Knowledge",
+      "/perfil": "Perfil de usuario – Knowledge",
       "/login": "Iniciar sesión – Knowledge",
       "/register": "Registro – Knowledge",
     };
+
     document.title = map[location.pathname] || "Knowledge";
 
     if (!ttsEnabled) return;
-    const u = new SpeechSynthesisUtterance(`Navegaste a ${document.title}`);
-    u.lang = "es-ES";
-    speechSynthesis.speak(u);
+    const msg = new SpeechSynthesisUtterance(`Navegaste a ${document.title}`);
+    msg.lang = "es-ES";
+    speechSynthesis.speak(msg);
   }, [location, ttsEnabled]);
 
   return null;
 };
 
+// ==============================
+// 📍 RUTAS PRINCIPALES
+// ==============================
 function AppRoutes() {
   return (
     <Routes>
+      {/* 🏠 Página principal */}
       <Route path="/" element={<Home />} />
 
+      {/* 👤 Panel del usuario */}
       <Route
         path="/dashboard"
         element={
@@ -59,6 +68,17 @@ function AppRoutes() {
         }
       />
 
+      {/* 👥 Perfil del usuario */}
+      <Route
+        path="/perfil"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 🧑‍💼 Panel del administrador */}
       <Route
         path="/admin"
         element={
@@ -68,18 +88,27 @@ function AppRoutes() {
         }
       />
 
+      {/* 🌍 Comunidad */}
       <Route path="/eventos" element={<Eventos />} />
       <Route path="/donaciones" element={<Donaciones />} />
       <Route path="/feedback" element={<Feedback />} />
 
+      {/* 🔐 Autenticación */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      <Route path="*" element={<div className="p-10 text-center">404 • Página no encontrada</div>} />
+      {/* ❌ 404 */}
+      <Route
+        path="*"
+        element={<div className="p-10 text-center">404 • Página no encontrada</div>}
+      />
     </Routes>
   );
 }
 
+// ==============================
+// 🚀 APLICACIÓN PRINCIPAL
+// ==============================
 export default function App() {
   return (
     <AuthProvider>
@@ -87,9 +116,11 @@ export default function App() {
         <BrowserRouter>
           <Navbar />
           <ScreenReaderAnnouncer />
-          <div className="min-h-[calc(100vh-64px)] bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white transition">
+
+          <main className="min-h-[calc(100vh-64px)] bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white transition">
             <AppRoutes />
-          </div>
+          </main>
+
           <AccessibilityPanel />
         </BrowserRouter>
       </AccessibilityProvider>

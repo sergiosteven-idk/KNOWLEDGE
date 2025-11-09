@@ -1,18 +1,26 @@
+// ==============================
+// 🌐 API SERVICE — KNOWLEDGE
+// ==============================
+
 import axios from "axios";
 
-// 🔗 Configuración base
+// 🔗 Instancia base de Axios
 const api = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
-// 🔒 Interceptor para incluir token JWT en cada request
+// 🔒 Interceptor para enviar token en cada request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// 🧩 Funciones de utilidad (helpers)
+// ==============================
+// 📊 HELPERS — llamados reutilizables
+// ==============================
+
+// Obtener progreso del usuario
 export const obtenerProgreso = async (userId, token) => {
   const res = await api.get(`/progreso/${userId}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
@@ -20,11 +28,34 @@ export const obtenerProgreso = async (userId, token) => {
   return res.data;
 };
 
-// puedes seguir añadiendo más helpers si lo deseas, por ejemplo:
-export const obtenerEventos = async () => (await api.get("/eventos")).data;
-export const crearDonacion = async (payload) =>
-  (await api.post("/donaciones", payload)).data;
-export const enviarFeedback = async (payload) =>
-  (await api.post("/feedback", payload)).data;
+// Subir contenido (usuario)
+export const subirContenido = async (payload) => {
+  const res = await api.post("/contenido", payload);
+  return res.data;
+};
+
+// Obtener contenido del usuario
+export const obtenerContenidoUsuario = async (userId) => {
+  const res = await api.get(`/contenido/mis/${userId}`);
+  return res.data;
+};
+
+// Obtener eventos
+export const obtenerEventos = async () => {
+  const res = await api.get("/eventos");
+  return res.data;
+};
+
+// Crear donación
+export const crearDonacion = async (payload) => {
+  const res = await api.post("/donaciones", payload);
+  return res.data;
+};
+
+// Enviar feedback
+export const enviarFeedback = async (payload) => {
+  const res = await api.post("/feedback", payload);
+  return res.data;
+};
 
 export default api;
