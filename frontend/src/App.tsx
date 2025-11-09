@@ -1,56 +1,98 @@
 // ==============================
-// 🌐 KNOWLEDGE FRONTEND APP (Final)
+// 🌐 KNOWLEDGE FRONTEND APP (Rutas reales)
 // ==============================
+import React, { useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import Navbar from "./components/layout/Navbar";
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import Eventos from "./pages/community/Eventos";
+import Donaciones from "./pages/community/Donaciones";
+import Feedback from "./pages/community/Feedback";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AccessibilityProvider, useAccessibility } from "./contexts/AccessibilityContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import AccessibilityPanel from "./components/accessibility/AccessibilityPanel";
 
-import React from 'react';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import Eventos from './pages/community/Eventos';
-import Donaciones from './pages/community/Donaciones';
-import Feedback from './pages/community/Feedback';
-import AccessibilityPanel from './components/accessibility/AccessibilityPanel';
-import { AccessibilityProvider } from './contexts/AccessibilityContext';
+// Anuncia cambios de página con TTS si está activo y actualiza el título
+const ScreenReaderAnnouncer = () => {
+  const { ttsEnabled } = useAccessibility();
+  const location = useLocation();
 
-function App() {
+  useEffect(() => {
+    // Título por ruta
+    const map = {
+      "/": "Inicio – Knowledge",
+      "/dashboard": "Panel de usuario – Knowledge",
+      "/admin": "Administración – Knowledge",
+      "/eventos": "Eventos – Knowledge",
+      "/donaciones": "Donaciones – Knowledge",
+      "/feedback": "Feedback – Knowledge",
+      "/login": "Iniciar sesión – Knowledge",
+      "/register": "Registro – Knowledge",
+    };
+    document.title = map[location.pathname] || "Knowledge";
+
+    if (!ttsEnabled) return;
+    const u = new SpeechSynthesisUtterance(`Navegaste a ${document.title}`);
+    u.lang = "es-ES";
+    speechSynthesis.speak(u);
+  }, [location, ttsEnabled]);
+
+  return null;
+};
+
+function AppRoutes() {
   return (
-    <AccessibilityProvider>
-      <main className="min-h-screen flex flex-col items-center bg-gray-50 dark:bg-gray-900 transition">
-        {/* Página principal */}
-        <section id="home" className="w-full flex flex-col items-center justify-center py-16">
-          <Home />
-        </section>
+    <Routes>
+      <Route path="/" element={<Home />} />
 
-        {/* Dashboard de progreso */}
-        <section id="dashboard" className="w-full py-10">
-          <Dashboard />
-        </section>
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Panel de administración */}
-        <section id="admin" className="w-full py-10">
-          <AdminDashboard />
-        </section>
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute roles={["docente", "super_admin"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Eventos comunitarios */}
-        <section id="eventos" className="w-full py-10">
-          <Eventos />
-        </section>
+      <Route path="/eventos" element={<Eventos />} />
+      <Route path="/donaciones" element={<Donaciones />} />
+      <Route path="/feedback" element={<Feedback />} />
 
-        {/* Donaciones */}
-        <section id="donaciones" className="w-full py-10">
-          <Donaciones />
-        </section>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-        {/* Feedback y comentarios */}
-        <section id="feedback" className="w-full py-10">
-          <Feedback />
-        </section>
-
-        {/* Panel de accesibilidad flotante */}
-        <AccessibilityPanel />
-      </main>
-    </AccessibilityProvider>
+      <Route path="*" element={<div className="p-10 text-center">404 • Página no encontrada</div>} />
+    </Routes>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <AccessibilityProvider>
+        <BrowserRouter>
+          <Navbar />
+          <ScreenReaderAnnouncer />
+          <div className="min-h-[calc(100vh-64px)] bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white transition">
+            <AppRoutes />
+          </div>
+          <AccessibilityPanel />
+        </BrowserRouter>
+      </AccessibilityProvider>
+    </AuthProvider>
+  );
+}
