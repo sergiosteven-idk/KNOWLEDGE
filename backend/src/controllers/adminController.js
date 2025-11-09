@@ -11,11 +11,17 @@ exports.obtenerContenidos = async (req, res) => {
          id_contenido,
          titulo,
          tipo,
-         /* normalizamos posibles 'borrador' o NULL a 'pendiente' */
-         CASE WHEN estado IS NULL OR estado='borrador' THEN 'pendiente' ELSE estado END AS estado,
+         id_autor,
+         (SELECT CONCAT(nombre, ' ', apellido) FROM Miembro WHERE id_usuario = c.id_autor) AS autor,
+         archivo_url,
+         extension,
+         CASE 
+           WHEN estado IS NULL OR estado='borrador' THEN 'pendiente'
+           ELSE estado
+         END AS estado,
          nivel_dificultad,
          DATE_FORMAT(fecha_publicacion, '%Y-%m-%d %H:%i:%s') AS fecha_publicacion
-       FROM ContenidoEducativo
+       FROM ContenidoEducativo c
        ORDER BY fecha_publicacion DESC`
     );
     res.json(rows);

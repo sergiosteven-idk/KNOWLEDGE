@@ -1,119 +1,155 @@
 import React, { useEffect, useState } from "react";
-import api, { eliminarContenido } from "../../services/api";
-import { useAccessibility } from "../../contexts/AccessibilityContext";
+import axios from "axios";
 
 const ContenidoAdmin = () => {
-  const { highContrast, darkMode } = useAccessibility();
   const [contenidos, setContenidos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const token = localStorage.getItem("token") || "";
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchContenidos = async () => {
     try {
-      const res = await api.get("/admin/contenido");
+      const res = await axios.get("http://localhost:5000/api/admin/contenidos", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setContenidos(res.data);
     } catch (error) {
-      console.error("Error al cargar contenidos:", error);
+      console.error("❌ Error al obtener contenidos:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchContenidos();
   }, []);
 
-  const aprobar = async (id: number) => {
-    await api.put(`/admin/contenido/${id}/aprobar`);
-    fetchData();
-  };
-
-  const rechazar = async (id: number) => {
-    await api.put(`/admin/contenido/${id}/rechazar`);
-    fetchData();
-  };
-
-  const eliminar = async (id: number) => {
-    if (window.confirm("¿Seguro que deseas eliminar este contenido?")) {
-      await eliminarContenido(id);
-      fetchData();
+  const aprobarContenido = async (id: number) => {
+    if (!window.confirm("¿Aprobar este contenido?")) return;
+    try {
+      await axios.put(
+        `http://localhost:5000/api/admin/contenido/${id}/aprobar`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("✅ Contenido aprobado correctamente.");
+      fetchContenidos();
+    } catch (error) {
+      console.error("❌ Error al aprobar contenido:", error);
+      alert("Error al aprobar el contenido.");
     }
   };
 
+  const rechazarContenido = async (id: number) => {
+    if (!window.confirm("¿Rechazar este contenido?")) return;
+    try {
+      await axios.put(
+        `http://localhost:5000/api/admin/contenido/${id}/rechazar`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("❌ Contenido rechazado.");
+      fetchContenidos();
+    } catch (error) {
+      console.error("❌ Error al rechazar contenido:", error);
+      alert("Error al rechazar el contenido.");
+    }
+  };
+
+  const eliminarContenido = async (id: number) => {
+    if (!window.confirm("¿Eliminar este contenido permanentemente?")) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/admin/contenido/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert("🗑️ Contenido eliminado correctamente.");
+      fetchContenidos();
+    } catch (error) {
+      console.error("❌ Error al eliminar contenido:", error);
+      alert("Error al eliminar el contenido.");
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="text-center mt-10 text-blue-400 animate-pulse">
+        Cargando contenidos...
+      </div>
+    );
+
   return (
-    <div
-      className={`min-h-screen p-6 transition ${
-        highContrast
-          ? "bg-yellow-50 text-black"
-          : darkMode
-          ? "bg-gray-900 text-white"
-          : "bg-white text-gray-800"
-      }`}
-    >
-      <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center">
+    <div className="px-4 sm:px-8 py-6">
+      <h1 className="text-2xl font-bold text-blue-500 mb-6 text-center">
         Gestión de Contenidos
       </h1>
 
-      {loading ? (
-        <p className="text-center">Cargando contenidos...</p>
-      ) : contenidos.length === 0 ? (
-        <p className="text-center">No hay contenidos en el sistema.</p>
+      {contenidos.length === 0 ? (
+        <p className="text-center text-gray-400">
+          No hay contenidos en el sistema.
+        </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300 text-sm">
+          <table className="w-full border-collapse border border-gray-700 rounded-lg overflow-hidden shadow-lg">
             <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="p-3 border">Título</th>
-                <th className="p-3 border">Tipo</th>
-                <th className="p-3 border">Estado</th>
-                <th className="p-3 border">Nivel</th>
-                <th className="p-3 border">Fecha publicación</th>
-                <th className="p-3 border">Acciones</th>
+                <th className="p-3 border border-gray-700">Título</th>
+                <th className="p-3 border border-gray-700">Tipo</th>
+                <th className="p-3 border border-gray-700">Autor</th>
+                <th className="p-3 border border-gray-700">Estado</th>
+                <th className="p-3 border border-gray-700">Nivel</th>
+                <th className="p-3 border border-gray-700">Fecha</th>
+                <th className="p-3 border border-gray-700">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {contenidos.map((c) => (
                 <tr
                   key={c.id_contenido}
-                  className="text-center bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  className="text-center bg-gray-900 text-gray-200 hover:bg-gray-800 transition"
                 >
-                  <td className="p-2 border">{c.titulo}</td>
-                  <td className="p-2 border capitalize">{c.tipo || "—"}</td>
+                  <td className="p-2 border border-gray-700">{c.titulo}</td>
+                  <td className="p-2 border border-gray-700 capitalize">
+                    {c.tipo || "—"}
+                  </td>
+                  <td className="p-2 border border-gray-700">
+                    {c.autor || "Anónimo"}
+                  </td>
                   <td
                     className={`p-2 border font-semibold ${
                       c.estado === "aprobado"
-                        ? "text-green-600"
-                        : c.estado === "rechazado"
-                        ? "text-red-600"
-                        : "text-yellow-600"
+                        ? "text-green-400"
+                        : c.estado === "pendiente"
+                        ? "text-yellow-400"
+                        : "text-red-400"
                     }`}
                   >
-                    {c.estado || "pendiente"}
+                    {c.estado}
                   </td>
-                  <td className="p-2 border">{c.nivel_dificultad || "—"}</td>
-                  <td className="p-2 border text-xs">
+                  <td className="p-2 border border-gray-700">
+                    {c.nivel_dificultad || "—"}
+                  </td>
+                  <td className="p-2 border border-gray-700">
                     {c.fecha_publicacion || "—"}
                   </td>
-                  <td className="p-2 border space-x-2">
+                  <td className="p-2 border border-gray-700 space-x-2">
                     {c.estado !== "aprobado" && (
-                      <>
-                        <button
-                          onClick={() => aprobar(c.id_contenido)}
-                          className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-lg"
-                        >
-                          Aprobar
-                        </button>
-                        <button
-                          onClick={() => rechazar(c.id_contenido)}
-                          className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg"
-                        >
-                          Rechazar
-                        </button>
-                      </>
+                      <button
+                        onClick={() => aprobarContenido(c.id_contenido)}
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md"
+                      >
+                        Aprobar
+                      </button>
+                    )}
+                    {c.estado !== "rechazado" && (
+                      <button
+                        onClick={() => rechazarContenido(c.id_contenido)}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-md"
+                      >
+                        Rechazar
+                      </button>
                     )}
                     <button
-                      onClick={() => eliminar(c.id_contenido)}
-                      className="bg-gray-700 hover:bg-gray-800 text-white py-1 px-3 rounded-lg"
+                      onClick={() => eliminarContenido(c.id_contenido)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
                     >
                       Eliminar
                     </button>
