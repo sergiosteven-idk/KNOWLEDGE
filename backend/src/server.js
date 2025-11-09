@@ -10,7 +10,12 @@ const db = require('./config/db');
 // Rutas importadas
 const authRoutes = require('./routes/authRoutes');
 const contenidoRoutes = require('./routes/contenidoRoutes');
-const progresoRoutes = require('./routes/progresoRoutes'); // ✅ progreso
+const progresoRoutes = require('./routes/progresoRoutes');
+const adminRoutes = require('./routes/adminRoutes'); 
+const eventoRoutes = require('./routes/eventoRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
+const donacionRoutes = require('./routes/donacionRoutes');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,12 +29,21 @@ app.use(express.json());
 // ==============================
 // 🚦 RUTAS PRINCIPALES
 // ==============================
-app.use('/api/auth', authRoutes);        // Autenticación
-app.use('/api/contenido', contenidoRoutes); // Contenido educativo
-app.use('/api/progreso', progresoRoutes);   // Progreso del usuario
+
+// 🔐 Autenticación (login / registro)
+app.use('/api/auth', authRoutes);
+
+// 📚 Contenido educativo (CRUD)
+app.use('/api/contenido', contenidoRoutes);
+
+// 📊 Progreso del usuario (Dashboard)
+app.use('/api/progreso', progresoRoutes);
+
+// 🧑‍💼 Administración del sistema (usuarios, contenido, estadísticas)
+app.use('/api/admin', adminRoutes);
 
 // ==============================
-// 🩺 RUTA DE SALUD (test rápido)
+// 🩺 RUTA DE SALUD (verificación rápida)
 // ==============================
 app.get('/api/health', (req, res) => {
   res.json({
