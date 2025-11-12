@@ -1,8 +1,140 @@
+/* Import animation styles - MUST be before all other CSS rules per CSS spec */
+@import "./styles/animations.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Estilo personalizado para los botones accesibles */
-.btn {
-  @apply px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition;
+/* ==============================
+   🌍 ESTILOS BASE KNOWLEDGE
+   ============================== */
+
+/* Fuente global limpia y legible */
+@layer base {
+  html {
+    /* usar colores corporativos Knowledge */
+    @apply font-sans text-black bg-knowledge-light dark:bg-knowledge-dark text-readable;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply transition-colors duration-300 ease-smooth;
+  }
+
+  /* Enlaces accesibles */
+  a {
+    @apply text-black hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-knowledge-green;
+  }
+
+  /* Titulares con jerarquía visual */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold text-gray-900 dark:text-white;
+  }
+
+  /* Texto más legible */
+  p {
+    @apply leading-relaxed text-gray-700 dark:text-gray-200;
+  }
+
+  /* Enfoque accesible universal */
+  :focus-visible {
+    outline: 3px solid #2563EB;
+    outline-offset: 3px;
+  }
+
+  /* Soporte de alto contraste */
+  .high-contrast {
+    filter: contrast(1.4) saturate(1.2);
+  }
+
+  /* Modo enfoque: (anteriormente atenúa todo; eliminado por problema de usabilidad) */
+  /* Nota: la clase `focus-mode` permanece como flag en el DOM por compatibilidad,
+     pero no aplica la opacidad global. Si quieres un comportamiento alternativo
+     definimos una regla más segura y localizada (ej. outline en main o overlay). */
+
+  /* Texto grande */
+  html.large-text {
+    font-size: 120%;
+  }
 }
+
+/* ==============================
+   🔘 BOTONES ACCESIBLES
+   ============================== */
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 ease-smooth focus-visible:outline-none focus-visible:ring-2;
+  }
+
+  /* Botón primario Knowledge (azul) */
+  .btn-primary {
+    @apply bg-knowledge-purple text-white hover:bg-knowledge-purple/90 focus-visible:ring-knowledge-purple;
+  }
+
+  /* Botón accesibilidad (verde) */
+  .btn-access {
+    @apply bg-knowledge-green text-white hover:bg-knowledge-green/90 focus-visible:ring-knowledge-green;
+  }
+
+  /* Botón inclusivo (morado) */
+  .btn-inclusive {
+    @apply bg-knowledge-purple text-white hover:bg-knowledge-purple/90 focus-visible:ring-knowledge-purple;
+  }
+
+  /* Botón contraste (amarillo / negro) */
+  .btn-contrast {
+    @apply bg-knowledge-yellow text-black hover:bg-knowledge-yellow/90 focus-visible:ring-knowledge-yellow;
+  }
+}
+
+/* ==============================
+   ⚙️ ANIMACIONES & EFECTOS SUAVES
+   ============================== */
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-pop {
+    animation: pop 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+}
+
+/* ==============================
+   👁️ MODO ENFOQUE (LECTURA) - Comportamiento seguro
+   ============================== */
+/* Resalta únicamente el <main> cuando el body tiene la clase .focus-mode.
+   No aplicamos opacidad global ni bloqueamos eventos para evitar problemas
+   de accesibilidad y usabilidad. */
+.focus-mode main {
+  position: relative;
+  z-index: 50;
+  border-radius: 0.75rem;
+  transform: translateZ(0);
+  box-shadow: 0 12px 40px rgba(2,6,23,0.08), 0 0 0 6px rgba(124,58,237,0.12);
+  transition: box-shadow 240ms cubic-bezier(0.4,0,0.2,1), transform 240ms;
+}
+
+/* Opcional: suavizar el fondo alrededor sin bloquear interacción (pointer-events:none)
+   usando un pseudo-elemento; activarlo si se quiere más contraste visual. */
+.focus-mode main::after {
+  content: "";
+  position: absolute;
+  inset: -1rem;
+  z-index: -1;
+  border-radius: inherit;
+  background: transparent; /* dejar transparente por defecto */
+}
+

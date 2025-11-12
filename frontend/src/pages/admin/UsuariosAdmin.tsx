@@ -2,7 +2,7 @@
 // 👥 PANEL DE USUARIOS ADMINISTRATIVO — KNOWLEDGE
 // ==============================
 import React, { useEffect, useState } from "react";
-import api from "../../services/api";
+import api from "../../services/api.js";
 import { useAccessibility } from "../../contexts/AccessibilityContext";
 
 const UsuariosAdmin = () => {
@@ -35,7 +35,7 @@ const UsuariosAdmin = () => {
           : "bg-white text-gray-800"
       }`}
     >
-      <h2 className="text-2xl font-semibold mb-4 text-blue-600">
+  <h2 className="text-2xl font-semibold mb-4 text-knowledge-purple">
         Usuarios registrados
       </h2>
 
@@ -46,7 +46,7 @@ const UsuariosAdmin = () => {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300 text-sm">
-            <thead className="bg-blue-600 text-white">
+            <thead className="bg-knowledge-purple text-white">
               <tr>
                 <th className="p-2 border">Nombre</th>
                 <th className="p-2 border">Correo</th>

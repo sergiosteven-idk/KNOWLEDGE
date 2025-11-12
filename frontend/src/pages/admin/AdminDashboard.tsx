@@ -2,7 +2,7 @@
 // 🧑‍💼 PANEL ADMINISTRATIVO — KNOWLEDGE
 // ==============================
 import React, { useEffect, useState } from "react";
-import api from "../../services/api";
+import api from "../../services/api.js";
 import ContenidoAdmin from "./ContenidoAdmin";
 import UsuariosAdmin from "./UsuariosAdmin";
 import { useAccessibility } from "../../contexts/AccessibilityContext";
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
           : "bg-white text-gray-800"
       }`}
     >
-      <h1 className="text-3xl font-bold text-blue-600 mb-8 text-center">
+  <h1 className="text-3xl font-bold text-knowledge-purple mb-8 text-center">
         Panel Administrativo
       </h1>
 
@@ -47,7 +47,7 @@ const AdminDashboard = () => {
         <button
           onClick={() => setView("usuarios")}
           className={`px-4 py-2 rounded-lg transition ${
-            view === "usuarios" ? "bg-blue-600 text-white" : "bg-gray-200 dark:bg-gray-700"
+            view === "usuarios" ? "bg-knowledge-purple text-white" : "bg-gray-200 dark:bg-gray-700"
           }`}
         >
           👥 Usuarios
@@ -55,7 +55,7 @@ const AdminDashboard = () => {
         <button
           onClick={() => setView("contenido")}
           className={`px-4 py-2 rounded-lg transition ${
-            view === "contenido" ? "bg-blue-600 text-white" : "bg-gray-200 dark:bg-gray-700"
+            view === "contenido" ? "bg-knowledge-purple text-white" : "bg-gray-200 dark:bg-gray-700"
           }`}
         >
           📚 Contenido
@@ -63,7 +63,7 @@ const AdminDashboard = () => {
         <button
           onClick={() => setView("estadisticas")}
           className={`px-4 py-2 rounded-lg transition ${
-            view === "estadisticas" ? "bg-blue-600 text-white" : "bg-gray-200 dark:bg-gray-700"
+            view === "estadisticas" ? "bg-knowledge-purple text-white" : "bg-gray-200 dark:bg-gray-700"
           }`}
         >
           📊 Estadísticas
@@ -75,21 +75,21 @@ const AdminDashboard = () => {
 
       {view === "estadisticas" && (
         <section className="mt-6">
-          <h2 className="text-2xl font-semibold mb-4 text-blue-500">Estadísticas del Sistema</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-knowledge-purple">Estadísticas del Sistema</h2>
           {loadingStats ? (
             <p className="text-center">Cargando datos...</p>
           ) : (
             <div className="grid sm:grid-cols-3 gap-4 text-center">
               <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
-                <h3 className="text-lg font-bold text-blue-600">Usuarios</h3>
+                <h3 className="text-lg font-bold text-knowledge-purple">Usuarios</h3>
                 <p className="text-3xl font-bold mt-2">{estadisticas.usuarios}</p>
               </div>
               <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
-                <h3 className="text-lg font-bold text-blue-600">Contenidos</h3>
+                <h3 className="text-lg font-bold text-knowledge-purple">Contenidos</h3>
                 <p className="text-3xl font-bold mt-2">{estadisticas.contenidos}</p>
               </div>
               <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
-                <h3 className="text-lg font-bold text-blue-600">Promedio progreso</h3>
+                <h3 className="text-lg font-bold text-knowledge-purple">Promedio progreso</h3>
                 <p className="text-3xl font-bold mt-2">{estadisticas.promedio_progreso}%</p>
               </div>
             </div>
