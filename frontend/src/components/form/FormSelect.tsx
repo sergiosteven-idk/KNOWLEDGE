@@ -33,10 +33,10 @@ export default function FormSelect({
       <div className={`relative ${error ? "mb-2" : ""}`}>
         <select
           {...props}
-          className={`w-full px-4 py-3 rounded-xl bg-white text-black text-base font-medium focus:outline-none focus:ring-2 focus:ring-knowledge-purple transition-all duration-200 shadow-sm hover:shadow-md appearance-none cursor-pointer ${
+          className={`w-full px-4 py-3 rounded-xl bg-white text-black text-base font-medium focus:outline-none focus:ring-2 focus:ring-knowledge-purple focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 shadow-sm hover:shadow-md focus:shadow-lg appearance-none cursor-pointer ${
             error
-              ? "border-2 border-red-400 focus:ring-red-500"
-              : "border border-gray-200 focus:border-knowledge-purple"
+              ? "border-2 border-red-400 focus:ring-red-500 focus:ring-offset-red-50"
+              : "border border-gray-200 focus:border-knowledge-purple hover:border-gray-300"
           } ${className || ""}`}
         >
           {options.map((option) => (

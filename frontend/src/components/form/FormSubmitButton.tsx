@@ -23,7 +23,7 @@ export default function FormSubmitButton({
       disabled={disabled || loading}
       className={`${
         fullWidth ? "w-full" : ""
-      } px-6 py-3 rounded-xl bg-white text-knowledge-purple font-extrabold text-base md:text-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-knowledge-purple disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg ${className || ""}`}
+      } px-6 py-3 rounded-xl bg-white text-knowledge-purple font-extrabold text-base md:text-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-knowledge-purple disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg ${className || ""}`}
     >
       {loading ? (
         <>

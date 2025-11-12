@@ -8,7 +8,7 @@ import FormContainer from "../../components/form/FormContainer";
 import FormLabel from "../../components/form/FormLabel";
 import FormInput from "../../components/form/FormInput";
 import FormSubmitButton from "../../components/form/FormSubmitButton";
-import { Logo } from "../../components/Logo";
+import Logo from "../../components/Logo";
 
 export default function Login() {
   const { login, loading } = useAuth();
@@ -33,9 +33,9 @@ export default function Login() {
     <FormContainer title="Iniciar sesión" subtitle="Bienvenido a Knowledge">
       <form onSubmit={handleSubmit} className="w-full space-y-5">
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg animate-scale-in">
             <p className="text-red-700 font-semibold flex items-center gap-2">
-              <span>⚠️</span> {error}
+              <span className="animate-shake">⚠️</span> {error}
             </p>
           </div>
         )}

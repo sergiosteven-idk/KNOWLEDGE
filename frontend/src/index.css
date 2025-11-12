@@ -1,9 +1,9 @@
+/* Import animation styles - MUST be before all other CSS rules per CSS spec */
+@import "./styles/animations.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import animation styles */
-@import "./styles/animations.css";
 
 /* ==============================
    🌍 ESTILOS BASE KNOWLEDGE

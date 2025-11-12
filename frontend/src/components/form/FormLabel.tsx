@@ -16,10 +16,10 @@ export default function FormLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="flex items-center gap-2 text-white font-semibold mb-3 text-sm md:text-base cursor-pointer"
+      className="flex items-center gap-2 text-white font-semibold mb-3 text-sm md:text-base cursor-pointer group transition-colors duration-200 hover:text-purple-100"
     >
       {icon && (
-        <span className="text-xl md:text-2xl flex-shrink-0" aria-hidden>
+        <span className="text-xl md:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-200" aria-hidden>
           {icon}
         </span>
       )}

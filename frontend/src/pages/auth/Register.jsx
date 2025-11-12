@@ -63,16 +63,18 @@ export default function Register() {
     <FormContainer title="Crear cuenta" subtitle="Únete a la comunidad Knowledge">
       <form onSubmit={handleSubmit} className="w-full space-y-5">
         {errors.submit && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg animate-scale-in">
             <p className="text-red-700 font-semibold flex items-center gap-2">
-              <span>⚠️</span> {errors.submit}
+              <span className="animate-shake">⚠️</span> {errors.submit}
             </p>
           </div>
         )}
 
         {successMsg && (
-          <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
-            <p className="text-green-700 font-semibold">{successMsg}</p>
+          <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg animate-scale-in">
+            <p className="text-green-700 font-semibold flex items-center gap-2">
+              <span className="animate-checkmark">✅</span> {successMsg}
+            </p>
           </div>
         )}
 

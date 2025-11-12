@@ -10,6 +10,7 @@ import FormLabel from '../../components/form/FormLabel';
 import FormInput from '../../components/form/FormInput';
 import FormTextarea from '../../components/form/FormTextarea';
 import FormSubmitButton from '../../components/form/FormSubmitButton';
+import TextToSpeechHover from '../../components/accessibility/TextToSpeechHover';
 
 const Feedback = () => {
   const [comentario, setComentario] = useState('');
@@ -104,15 +105,17 @@ const Feedback = () => {
             </h2>
 
             {successMsg && (
-              <div className="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
-                <p className="text-green-700 font-semibold">{successMsg}</p>
+              <div className="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-lg animate-scale-in">
+                <p className="text-green-700 font-semibold flex items-center gap-2">
+                  <span className="animate-checkmark">✅</span> {successMsg}
+                </p>
               </div>
             )}
 
             {submitError && (
-              <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+              <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg animate-scale-in">
                 <p className="text-red-700 font-semibold flex items-center gap-2">
-                  <span>⚠️</span> {submitError}
+                  <span className="animate-shake">⚠️</span> {submitError}
                 </p>
               </div>
             )}
@@ -192,28 +195,32 @@ const Feedback = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 stagger-container">
               {feedbacks.map((fb, index) => (
-                <Card
+                <TextToSpeechHover
                   key={fb.id_feedback}
+                  text={`Opinión de ${fb.nombre} ${fb.apellido}. Calificación: ${fb.calificacion} de 5 estrellas. Comentario: ${fb.comentario}`}
+                  tag="div"
                   className={`animate-fade-in-delay-${Math.min(index, 3)}`}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="font-semibold text-knowledge-purple text-base md:text-lg">
-                        {fb.nombre} {fb.apellido}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-2xl">⭐</span>
-                        <span className="font-extrabold text-knowledge-purple text-lg">
-                          {fb.calificacion}
-                        </span>
-                        <span className="text-gray-500 text-sm">/5</span>
+                  <Card>
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="font-semibold text-knowledge-purple text-base md:text-lg">
+                          {fb.nombre} {fb.apellido}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-2xl">⭐</span>
+                          <span className="font-extrabold text-knowledge-purple text-lg">
+                            {fb.calificacion}
+                          </span>
+                          <span className="text-gray-500 text-sm">/5</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <p className="text-gray-700 text-base leading-relaxed">
-                    {fb.comentario}
-                  </p>
-                </Card>
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      {fb.comentario}
+                    </p>
+                  </Card>
+                </TextToSpeechHover>
               ))}
             </div>
           )}

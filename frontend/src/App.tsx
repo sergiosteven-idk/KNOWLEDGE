@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // 📦 Lazy load de páginas para optimizar bundle
 const Home = lazy(() => import("./pages/Home"));
+const SearchResults = lazy(() => import("./pages/SearchResults"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const Eventos = lazy(() => import("./pages/community/Eventos"));
@@ -19,6 +20,7 @@ const Donaciones = lazy(() => import("./pages/community/Donaciones"));
 const Feedback = lazy(() => import("./pages/community/Feedback"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const Profile = lazy(() => import("./pages/Profile"));
 
 // ⚠️ Fallback mientras carga
@@ -90,8 +92,10 @@ interface RouteConfig {
 const ROUTES: RouteConfig[] = [
   // Públicas
   { path: "/", element: <Home /> },
+  { path: "/buscar", element: <SearchResults /> },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
+  { path: "/olvide-contrasena", element: <ForgotPassword /> },
   { path: "/eventos", element: <Eventos /> },
   { path: "/donaciones", element: <Donaciones /> },
   { path: "/feedback", element: <Feedback /> },

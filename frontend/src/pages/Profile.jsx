@@ -82,17 +82,17 @@ export default function Profile() {
         <div className="max-w-2xl mx-auto">
           <Card>
             {successMsg && (
-              <div className="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
+              <div className="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-lg animate-scale-in">
                 <p className="text-green-700 font-semibold flex items-center gap-2">
-                  <span>✅</span> {successMsg}
+                  <span className="animate-checkmark">✅</span> {successMsg}
                 </p>
               </div>
             )}
 
             {errors.submit && (
-              <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+              <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg animate-scale-in">
                 <p className="text-red-700 font-semibold flex items-center gap-2">
-                  <span>⚠️</span> {errors.submit}
+                  <span className="animate-shake">⚠️</span> {errors.submit}
                 </p>
               </div>
             )}

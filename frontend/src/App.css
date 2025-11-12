@@ -2,6 +2,9 @@
    🌍 APP.CSS — KNOWLEDGE GLOBAL
    ============================== */
 
+/* Note: @import statements moved to index.css to comply with CSS spec
+   (@import must precede all other statements including comments) */
+
 /* BOTONES UNIVERSALES KNOWLEDGE */
 .btn {
   @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 ease-smooth

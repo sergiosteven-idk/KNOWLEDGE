@@ -31,10 +31,10 @@ export default function FormTextarea({
       <div className={`relative ${error ? "mb-2" : ""}`}>
         <textarea
           {...props}
-          className={`w-full px-4 py-3 rounded-xl bg-white text-black text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-knowledge-purple transition-all duration-200 shadow-sm hover:shadow-md resize-none ${
+          className={`w-full px-4 py-3 rounded-xl bg-white text-black text-base font-medium placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-knowledge-purple focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 shadow-sm hover:shadow-md focus:shadow-lg resize-none ${
             error
-              ? "border-2 border-red-400 focus:ring-red-500"
-              : "border border-gray-200 focus:border-knowledge-purple"
+              ? "border-2 border-red-400 focus:ring-red-500 focus:ring-offset-red-50"
+              : "border border-gray-200 focus:border-knowledge-purple hover:border-gray-300"
           } ${className || ""}`}
         />
       </div>

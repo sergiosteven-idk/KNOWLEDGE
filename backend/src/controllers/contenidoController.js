@@ -98,3 +98,59 @@ exports.obtenerContenidosAprobados = async (req, res) => {
     res.status(500).json({ message: "Error al obtener los contenidos aprobados." });
   }
 };
+
+// ==============================
+// 🔍 BÚSQUEDA DE CONTENIDO POR PALABRAS CLAVE (RF-22)
+// ==============================
+exports.buscarContenido = async (req, res) => {
+  try {
+    const { q, tipo, nivel } = req.query;
+    
+    if (!q || q.trim().length === 0) {
+      return res.status(400).json({ message: "Parámetro 'q' (búsqueda) es obligatorio" });
+    }
+
+    const keyword = `%${q.trim()}%`;
+    let query = `
+      SELECT 
+        id_contenido,
+        titulo,
+        descripcion,
+        tipo,
+        archivo_url,
+        nivel_dificultad,
+        DATE_FORMAT(fecha_publicacion, '%Y-%m-%d %H:%i:%s') AS fecha_publicacion,
+        (SELECT CONCAT(nombre, ' ', apellido) FROM Miembro WHERE id_usuario = c.id_autor) AS autor
+      FROM ContenidoEducativo c
+      WHERE estado = 'aprobado' 
+        AND (titulo LIKE ? OR descripcion LIKE ?)
+    `;
+    
+    const params = [keyword, keyword];
+
+    // Filtro por tipo opcional
+    if (tipo && ['video', 'pdf', 'curso', 'texto'].includes(tipo)) {
+      query += ` AND tipo = ?`;
+      params.push(tipo);
+    }
+
+    // Filtro por nivel optional
+    if (nivel && ['principiante', 'intermedio', 'avanzado'].includes(nivel)) {
+      query += ` AND nivel_dificultad = ?`;
+      params.push(nivel);
+    }
+
+    query += ` ORDER BY fecha_publicacion DESC`;
+
+    const [rows] = await db.query(query, params);
+    
+    res.json({
+      total: rows.length,
+      resultados: rows,
+      consulta: q
+    });
+  } catch (error) {
+    console.error("❌ Error al buscar contenido:", error);
+    res.status(500).json({ message: "Error al buscar contenido." });
+  }
+};
