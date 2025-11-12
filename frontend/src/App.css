@@ -1,3 +1,153 @@
+/* ==============================
+   🌍 APP.CSS — KNOWLEDGE GLOBAL
+   ============================== */
+
+/* BOTONES UNIVERSALES KNOWLEDGE */
 .btn {
-  @apply px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition;
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 ease-smooth
+         focus-visible:outline-none focus-visible:ring-2;
 }
+
+/* Botón principal Knowledge (Azul: conocimiento, acción) */
+.btn-primary {
+  @apply bg-knowledge-purple text-white hover:bg-knowledge-purple/90
+    focus-visible:ring-knowledge-purple focus-visible:ring-offset-2;
+}
+
+/* Botón de accesibilidad (Verde: inclusión, accesibilidad) */
+.btn-access {
+  @apply bg-knowledge-green text-white hover:bg-knowledge-green/90
+         focus-visible:ring-knowledge-green focus-visible:ring-offset-2;
+}
+
+/* Botón de acción inclusiva (Morado: innovación, diversidad) */
+.btn-inclusive {
+  @apply bg-knowledge-purple text-white hover:bg-knowledge-purple/90
+         focus-visible:ring-knowledge-purple focus-visible:ring-offset-2;
+}
+
+/* Botón de contraste (Amarillo: visibilidad, alerta) */
+.btn-contrast {
+  @apply bg-knowledge-yellow text-black hover:bg-knowledge-yellow/90
+         focus-visible:ring-knowledge-yellow focus-visible:ring-offset-2;
+}
+
+/* Botón neutro / secundario */
+.btn-neutral {
+  @apply bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white
+         focus-visible:ring-gray-400;
+}
+
+/* BOTONES DE ESTADO (para UX clara) */
+.btn-success {
+  @apply bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-500;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500;
+}
+
+.btn-warning {
+  @apply bg-yellow-500 text-black hover:bg-yellow-600 focus-visible:ring-yellow-400;
+}
+
+/* ==============================
+   💬 COMPONENTES INTERACTIVOS
+   ============================== */
+
+/* Tarjetas base Knowledge */
+.card {
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+         rounded-2xl shadow-soft p-4 transition-all duration-300 ease-smooth;
+}
+
+/* Inputs y selects accesibles */
+.input, .select, .textarea {
+  @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+         bg-knowledge-light dark:bg-knowledge-dark text-gray-800 dark:text-gray-100
+         focus-visible:ring-knowledge-purple focus-visible:ring-offset-2;
+}
+
+/* ==============================
+   🧠 LECTURA Y LEGIBILIDAD
+   ============================== */
+
+/* Texto general con mejor espaciado para comprensión */
+.text-readable {
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+/* Global text color rules: toda la letra negra por defecto, hover en verde */
+:root {
+  --knowledge-hover: #22C55E; /* verde accesibilidad */
+}
+
+/* Forzar texto negro en la UI (modo claro). No incluimos botones para preservar
+   su propio contraste (texto blanco en botones oscuros). */
+body, html, .app-root, .card {
+  color: #000 !important;
+}
+
+/* Modo oscuro: excepciones — texto claro por defecto en dark */
+.dark body, .dark html, .dark .app-root, .dark .card {
+  color: #fff !important;
+}
+
+/* Hover: texto verde para enlaces, botones y controles interactivos */
+a:hover, button:hover, .btn:hover, .nav-link:hover, .navlink:hover, .link:hover {
+  color: var(--knowledge-hover) !important;
+}
+
+/* Enlaces toman el color del contenedor por defecto (heredan). Mantener
+   focus ring accesible en verde corporativo. */
+a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* ==============================
+   ⚙️ UTILIDADES VISUALES
+   ============================== */
+
+/* Sombras suaves Knowledge */
+.shadow-soft {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Sombras de enfoque accesibles */
+.shadow-focus {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+}
+
+/* Transición base */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==============================
+   🦾 MODO ALTO CONTRASTE
+   ============================== */
+.high-contrast {
+  filter: contrast(1.4) saturate(1.2);
+}
+
+/* ==============================
+  👁️ MODO ENFOQUE (LECTURA)
+  ============================== */
+/* La regla que atenuaba todo excepto <main> fue eliminada porque causaba problemas
+  de usabilidad (bloqueo de interacción y pérdida de contexto). La clase
+  `focus-mode` todavía puede usarse como flag para implementaciones más seguras,
+  por ejemplo aplicando un outline o resaltando únicamente el <main>. */
+
+/* ==============================
+   🌗 SOPORTE MODO OSCURO
+   ============================== */
+.dark .btn-primary {
+  @apply bg-knowledge-purple/80 hover:bg-knowledge-purple/70;
+}
+
+.dark .card {
+  @apply border-gray-700;
+}
+

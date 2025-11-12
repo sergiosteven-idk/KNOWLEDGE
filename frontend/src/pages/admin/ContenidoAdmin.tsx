@@ -71,14 +71,14 @@ const ContenidoAdmin = () => {
 
   if (loading)
     return (
-      <div className="text-center mt-10 text-blue-400 animate-pulse">
+  <div className="text-center mt-10 text-knowledge-purple/80 animate-pulse">
         Cargando contenidos...
       </div>
     );
 
   return (
     <div className="px-4 sm:px-8 py-6">
-      <h1 className="text-2xl font-bold text-blue-500 mb-6 text-center">
+  <h1 className="text-2xl font-bold text-knowledge-purple mb-6 text-center">
         Gestión de Contenidos
       </h1>
 
@@ -89,7 +89,7 @@ const ContenidoAdmin = () => {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-700 rounded-lg overflow-hidden shadow-lg">
-            <thead className="bg-blue-600 text-white">
+            <thead className="bg-knowledge-purple text-white">
               <tr>
                 <th className="p-3 border border-gray-700">Título</th>
                 <th className="p-3 border border-gray-700">Tipo</th>

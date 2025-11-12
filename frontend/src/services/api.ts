@@ -1,10 +1,13 @@
-import axios from 'axios';
+// Archivo de declaraciones ligeras para TypeScript.
+// No importa la implementación real aquí (api.js), sólo habilita
+// que TypeScript reconozca los nombres exportados cuando se importan
+// desde "../services/api.js" en los componentes.
 
-const API_URL = 'http://localhost:5000/api';
+export declare function subirContenido(formData: any, setProgress?: (n: number) => void): Promise<any>;
+export declare function obtenerContenidoUsuario(userId: number): Promise<any>;
+export declare function obtenerProgreso(userId: number): Promise<any>;
+export declare function obtenerFeed(): Promise<any>;
+export declare function eliminarContenido(id: number): Promise<any>;
 
-export const obtenerProgreso = async (userId: number, token: string) => {
-  const res = await axios.get(`${API_URL}/progreso/${userId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};
+declare const api: any;
+export default api;

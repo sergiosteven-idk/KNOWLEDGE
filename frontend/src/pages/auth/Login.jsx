@@ -4,18 +4,23 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useAccessibility } from "../../contexts/AccessibilityContext";
+import FormContainer from "../../components/form/FormContainer";
+import FormLabel from "../../components/form/FormLabel";
+import FormInput from "../../components/form/FormInput";
+import FormSubmitButton from "../../components/form/FormSubmitButton";
+import { Logo } from "../../components/Logo";
 
 export default function Login() {
   const { login, loading } = useAuth();
-  const { highContrast, darkMode } = useAccessibility();
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     const res = await login(correo, contrasena);
     if (!res.ok) {
       setError(res.msg);
@@ -25,58 +30,80 @@ export default function Login() {
   };
 
   return (
-    <div
-      className={`min-h-screen flex items-center justify-center p-6 transition ${
-        highContrast
-          ? "bg-yellow-50 text-black"
-          : darkMode
-          ? "bg-gray-900 text-white"
-          : "bg-gray-50 text-gray-800"
-      }`}
-    >
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg"
-      >
-        <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center">
-          Iniciar sesión
-        </h1>
+    <FormContainer title="Iniciar sesión" subtitle="Bienvenido a Knowledge">
+      <form onSubmit={handleSubmit} className="w-full space-y-5">
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+            <p className="text-red-700 font-semibold flex items-center gap-2">
+              <span>⚠️</span> {error}
+            </p>
+          </div>
+        )}
 
-        {error && <p className="text-red-500 mb-3 text-center">{error}</p>}
+        <div>
+          <FormLabel icon="👤" required>
+            Correo electrónico
+          </FormLabel>
+          <FormInput
+            type="email"
+            placeholder="tu@correo.com"
+            value={correo}
+            onChange={(e) => setCorreo(e.target.value)}
+            icon="📧"
+            error={error ? true : false}
+            helperText="Ingresa el correo con el que te registraste"
+            required
+          />
+        </div>
 
-        <label className="block mb-2 font-semibold">Correo</label>
-        <input
-          type="email"
-          value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
-          className="w-full p-2 border rounded mb-4 text-black"
-          required
-        />
+        <div>
+          <FormLabel icon="🔐" required>
+            Contraseña
+          </FormLabel>
+          <FormInput
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            value={contrasena}
+            onChange={(e) => setContrasena(e.target.value)}
+            icon="🔒"
+            error={error ? true : false}
+            helperText={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-purple-200 hover:text-white transition-colors"
+              >
+                {showPassword ? "Ocultar" : "Mostrar"}
+              </button>
+            }
+            required
+          />
+        </div>
 
-        <label className="block mb-2 font-semibold">Contraseña</label>
-        <input
-          type="password"
-          value={contrasena}
-          onChange={(e) => setContrasena(e.target.value)}
-          className="w-full p-2 border rounded mb-6 text-black"
-          required
-        />
+        <div className="pt-4">
+          <FormSubmitButton type="submit" loading={loading} icon="→">
+            Iniciar sesión
+          </FormSubmitButton>
+        </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition"
-          disabled={loading}
-        >
-          {loading ? "Ingresando..." : "Entrar"}
-        </button>
-
-        <p className="text-sm mt-4 text-center">
-          ¿No tienes una cuenta?{" "}
-          <a href="/register" className="text-blue-600 hover:underline">
-            Regístrate aquí
+        <div className="flex flex-col items-center gap-3 pt-4 border-t border-white/10">
+          <a
+            href="#"
+            className="text-purple-200 hover:text-white text-sm transition-colors font-medium"
+          >
+            ¿Olvidaste tu contraseña?
           </a>
-        </p>
+          <p className="text-purple-100 text-sm">
+            ¿No tienes una cuenta?{" "}
+            <a
+              href="/register"
+              className="text-white font-semibold hover:text-purple-100 transition-colors"
+            >
+              Regístrate aquí
+            </a>
+          </p>
+        </div>
       </form>
-    </div>
+    </FormContainer>
   );
 }

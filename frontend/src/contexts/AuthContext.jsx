@@ -2,7 +2,7 @@
 // 🔒 CONTEXTO DE AUTENTICACIÓN — KNOWLEDGE
 // ==============================
 import React, { createContext, useContext, useEffect, useState } from "react";
-import api from "../services/api";
+import api from "../services/api.js";
 
 const AuthContext = createContext(null);
 
