@@ -46,17 +46,26 @@ exports.crearContenido = async (req, res) => {
   }
 };
 
-// 🔍 Obtener contenidos aprobados (feed público)
-exports.obtenerAprobados = async (req, res) => {
+// 📚 Obtener contenidos aprobados para el Home
+exports.obtenerContenidosAprobados = async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT id_contenido, titulo, descripcion, tipo, url_contenido, archivo_url, nivel_dificultad, fecha_publicacion 
-       FROM ContenidoEducativo WHERE estado = 'aprobado' ORDER BY fecha_publicacion DESC`
+      `SELECT 
+         id_contenido,
+         titulo,
+         tipo,
+         archivo_url,
+         nivel_dificultad,
+         DATE_FORMAT(fecha_publicacion, '%Y-%m-%d %H:%i:%s') AS fecha_publicacion,
+         (SELECT CONCAT(nombre, ' ', apellido) FROM Miembro WHERE id_usuario = c.id_autor) AS autor
+       FROM ContenidoEducativo c
+       WHERE estado = 'aprobado'
+       ORDER BY fecha_publicacion DESC`
     );
     res.json(rows);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error al obtener contenidos aprobados." });
+    console.error("❌ Error al obtener contenidos aprobados:", error);
+    res.status(500).json({ message: "Error al obtener los contenidos aprobados." });
   }
 };
 

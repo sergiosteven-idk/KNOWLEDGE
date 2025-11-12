@@ -4,7 +4,7 @@ const auth = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 const {
   crearContenido,
-  obtenerAprobados,
+  obtenerContenidosAprobados,
   obtenerPorUsuario,
 } = require("../controllers/contenidoController");
 
@@ -12,7 +12,7 @@ const {
 router.post("/", auth, upload.single("archivo"), crearContenido);
 
 // Feed público
-router.get("/aprobados", obtenerAprobados);
+router.get("/aprobados", obtenerContenidosAprobados);
 
 // Contenido por usuario
 router.get("/mis/:id", auth, obtenerPorUsuario);
