@@ -1,0 +1,46 @@
+{
+  "name": "Knowledge - Educación Inclusiva",
+  "short_name": "Knowledge",
+  "description": "Plataforma educativa inclusiva y accesible para todos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2563EB",
+  "theme_color": "#2563EB",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es-ES",
+  "dir": "ltr",
+  "categories": ["education", "social"],
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/vite.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Eventos",
+      "short_name": "Eventos",
+      "description": "Ver eventos educativos",
+      "url": "/eventos",
+      "icons": [{ "src": "/vite.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Donaciones",
+      "short_name": "Donar",
+      "description": "Realizar una donación",
+      "url": "/donaciones",
+      "icons": [{ "src": "/vite.svg", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

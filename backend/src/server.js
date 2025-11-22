@@ -25,9 +25,34 @@ const PORT = process.env.PORT || 5000;
 // ==============================
 // 🧩 MIDDLEWARES
 // ==============================
+
+// Obtener la IP local para configuración dinámica
+const os = require("os");
+const networkInterfaces = os.networkInterfaces();
+let localIP = "localhost";
+
+// Encontrar la IP de la red local
+Object.keys(networkInterfaces).forEach((interfaceName) => {
+  const interfaces = networkInterfaces[interfaceName];
+  interfaces.forEach((iface) => {
+    if (iface.family === "IPv4" && !iface.internal) {
+      localIP = iface.address;
+    }
+  });
+});
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"], // Ajusta si cambias el puerto del frontend
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      `http://${localIP}:5173`,
+      `http://${localIP}:3000`,
+      // Permitir cualquier origen en la red local para desarrollo móvil
+      /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:\d+$/,
+      /^http:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/,
+      /^http:\/\/172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3}:\d+$/,
+    ],
     credentials: true,
   })
 );
@@ -79,11 +104,13 @@ app.use((err, req, res, next) => {
 // ==============================
 // 🚀 INICIAR SERVIDOR
 // ==============================
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`
   ==============================
   🎓 Knowledge Backend Server
   ✅ Running on port: ${PORT}
+  🌐 Local: http://localhost:${PORT}
+  📱 Network: http://${localIP}:${PORT}
   📦 Uploads: /uploads
   ==============================
   `);

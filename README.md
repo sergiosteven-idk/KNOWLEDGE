@@ -5,6 +5,15 @@ markdown
 Permite a los usuarios subir contenido educativo, seguir su progreso, realizar donaciones y participar en eventos.  
 Los docentes y administradores pueden aprobar o rechazar contenido, gestionar usuarios y visualizar estadísticas globales.
 
+## 📱 **NUEVA: APLICACIÓN WEB MÓVIL**
+Knowledge ahora es una **Progressive Web App (PWA)** totalmente funcional en dispositivos móviles.  
+✅ Instalable como app nativa  
+✅ Funciona offline con caché  
+✅ Optimizada para touch y pantallas móviles  
+✅ Accesible desde cualquier dispositivo en tu red local
+
+**[Ver guía de inicio rápido móvil →](QUICK_START_MOBILE.md)**
+
 ---
 
 ## 🧩 ESTRUCTURA DEL PROYECTO
@@ -97,6 +106,12 @@ node src/server.js
 📡 Servidor en ejecución
 text
 http://localhost:5000
+
+📱 Para acceso móvil (red local):
+text
+http://TU_IP_LOCAL:5000
+(Ej: http://192.168.1.10:5000)
+
 💻 FRONTEND — React + Vite + TailwindCSS
 📦 Instalación
 bash
@@ -117,8 +132,11 @@ framer-motion	Animaciones fluidas y accesibles en componentes.
 clsx	Librería auxiliar para clases condicionales.
 ⚙️ Scripts útiles
 bash
-# Ejecutar modo desarrollo
+# Ejecutar modo desarrollo (desktop)
 npm run dev
+
+# Ejecutar modo desarrollo móvil (acceso en red)
+npm run mobile
 
 # Compilar para producción
 npm run build
@@ -127,7 +145,21 @@ npm run build
 npm run preview
 🌐 Interfaz disponible en:
 text
+# Desktop
 http://localhost:5173
+
+# Móvil (red local)
+http://TU_IP_LOCAL:5173
+(Ej: http://192.168.1.10:5173)
+
+📱 **Inicio Rápido Móvil:**
+bash
+# Ejecuta este script para configuración automática (Windows)
+setup-mobile.bat
+
+# O consulta la guía:
+# QUICK_START_MOBILE.md
+# MOBILE_DEPLOYMENT_GUIDE.md
 🔒 ROLES Y PERMISOS
 Rol	Funcionalidades
 🧑‍🎓 Estudiante	Subir y visualizar contenidos, seguir su progreso.
@@ -140,6 +172,9 @@ Rol	Funcionalidades
 ✅ Revisión y aprobación – Contenido validado antes de publicación.
 ✅ Dashboard de progreso – Seguimiento visual del avance.
 ✅ Panel administrativo – Usuarios, estadísticas y control de contenido.
+✅ **Progressive Web App (PWA)** – Instalable y funcional offline.
+✅ **Optimización móvil** – Touch gestures, responsive design.
+✅ **Acceso en red local** – Testeo en dispositivos móviles reales.
 ✅ Accesibilidad total – Lectura de texto, modo oscuro, contraste alto y control de fuente.
 ✅ Eventos y donaciones – Espacios para participación y soporte a la comunidad.
 

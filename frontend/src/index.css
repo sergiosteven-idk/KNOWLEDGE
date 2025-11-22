@@ -15,10 +15,19 @@
     /* usar colores corporativos Knowledge */
     @apply font-sans text-black bg-knowledge-light dark:bg-knowledge-dark text-readable;
     scroll-behavior: smooth;
+    /* Optimización móvil */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
   }
 
   body {
     @apply transition-colors duration-300 ease-smooth;
+    /* Evitar scroll horizontal en móvil */
+    overflow-x: hidden;
+    /* Mejorar rendering en móviles */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Enlaces accesibles */

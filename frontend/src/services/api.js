@@ -4,9 +4,20 @@
 
 import axios from "axios";
 
+// 📱 Configuración automática para desarrollo móvil
+// En producción, usa variables de entorno
+const getBaseURL = () => {
+  // Si estás en desarrollo y necesitas la IP de red, cámbiala aquí
+  // Ejemplo: return "http://192.168.1.10:5000/api";
+  
+  // Por defecto usa localhost, que funciona en desarrollo desktop
+  return import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+};
+
 // Instancia base de Axios
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: getBaseURL(),
+  timeout: 10000, // 10 segundos
 });
 
 // 🔒 Enviar token en cada request si existe
