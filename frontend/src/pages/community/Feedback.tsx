@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api.js';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Button from '../../components/ui/Button';
 import Container from '../../components/ui/Container';
 import Card from '../../components/ui/Card';
@@ -15,18 +16,19 @@ import TextToSpeechHover from '../../components/accessibility/TextToSpeechHover'
 const Feedback = () => {
   const [comentario, setComentario] = useState('');
   const [calificacion, setCalificacion] = useState(5);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string>('');
   const [successMsg, setSuccessMsg] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const token = localStorage.getItem('token') || '';
   const user = JSON.parse(localStorage.getItem('usuario') || '{}');
   const [searchParams] = useSearchParams();
   const id_contenido = searchParams.get('contenido');
 
-  // Obtener feedback existente
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
@@ -45,12 +47,11 @@ const Feedback = () => {
     fetchFeedbacks();
   }, [id_contenido]);
 
-  // Enviar nuevo feedback
   const enviarFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError('');
     setSuccessMsg('');
-    
+
     if (!comentario.trim()) {
       setSubmitError('El comentario no puede estar vacío');
       return;
@@ -65,11 +66,10 @@ const Feedback = () => {
         calificacion,
         comentario,
       });
-      setSuccessMsg('✅ ¡Gracias por tu opinión!');
+      setSuccessMsg('Gracias por tu opinión');
       setComentario('');
       setCalificacion(5);
 
-      // Refresh feedback list
       const url = id_contenido ? `/feedback/${id_contenido}` : '/feedback';
       const res = await api.get(url);
       setFeedbacks(res.data || []);
@@ -86,18 +86,16 @@ const Feedback = () => {
   return (
     <Container>
       <main className="py-6 md:py-8">
-        {/* Hero Section */}
         <section className="text-center mb-8 md:mb-12 px-4 animate-fade-in">
           <Logo size={60} className="md:w-20 md:h-20 mx-auto" />
           <h1 className="text-3xl md:text-4xl font-extrabold text-knowledge-purple mt-4 md:mt-6 mb-2 md:mb-3">
             Opiniones y Calificaciones
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base px-2">
+          <p className="text-black max-w-2xl mx-auto text-sm md:text-base px-2">
             Comparte tu experiencia con nuestra comunidad y ayuda a otros a conocer sobre este contenido.
           </p>
         </section>
 
-        {/* Feedback Form Card */}
         <div className="max-w-2xl mx-auto px-4 mb-10 md:mb-12">
           <Card>
             <h2 className="text-2xl md:text-3xl font-extrabold text-knowledge-purple mb-6">
@@ -106,7 +104,7 @@ const Feedback = () => {
 
             {successMsg && (
               <div className="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-lg animate-scale-in">
-                <p className="text-green-700 font-semibold flex items-center gap-2">
+                <p className="text-black font-semibold flex items-center gap-2">
                   <span className="animate-checkmark">✅</span> {successMsg}
                 </p>
               </div>
@@ -114,14 +112,13 @@ const Feedback = () => {
 
             {submitError && (
               <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg animate-scale-in">
-                <p className="text-red-700 font-semibold flex items-center gap-2">
+                <p className="text-black font-semibold flex items-center gap-2">
                   <span className="animate-shake">⚠️</span> {submitError}
                 </p>
               </div>
             )}
 
             <form onSubmit={enviarFeedback} className="space-y-5 md:space-y-6">
-              {/* Rating Input */}
               <div>
                 <FormLabel icon="⭐" required>
                   Calificación
@@ -139,18 +136,18 @@ const Feedback = () => {
                     {calificacion}
                   </span>
                 </div>
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
+                <div className="flex justify-between text-xs text-black mt-2">
                   <span>Muy malo</span>
                   <span>Excelente</span>
                 </div>
               </div>
 
-              {/* Comment Textarea */}
               <div>
                 <FormLabel icon="💬" required>
                   Tu comentario
                 </FormLabel>
                 <FormTextarea
+                  className="text-black"
                   placeholder="Comparte qué te pareció este contenido..."
                   value={comentario}
                   onChange={(e) => setComentario(e.target.value)}
@@ -160,19 +157,13 @@ const Feedback = () => {
                 />
               </div>
 
-              {/* Submit Button */}
-              <FormSubmitButton 
-                type="submit" 
-                loading={submitting}
-                icon="📤"
-              >
+              <FormSubmitButton type="submit" loading={submitting} icon="📤">
                 Enviar Opinión
               </FormSubmitButton>
             </form>
           </Card>
         </div>
 
-        {/* Feedback List Section */}
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-extrabold text-knowledge-purple mb-6 text-center">
             💭 Comentarios de la comunidad
@@ -188,7 +179,7 @@ const Feedback = () => {
             </Card>
           ) : feedbacks.length === 0 ? (
             <Card>
-              <p className="text-gray-600 text-center py-8">
+              <p className="text-black text-base leading-relaxed">
                 Aún no hay comentarios. ¡Sé el primero en compartir tu opinión!
               </p>
             </Card>
@@ -212,13 +203,11 @@ const Feedback = () => {
                           <span className="font-extrabold text-knowledge-purple text-lg">
                             {fb.calificacion}
                           </span>
-                          <span className="text-gray-500 text-sm">/5</span>
+                          <span className="text-black">/5</span>
                         </div>
                       </div>
                     </div>
-                    <p className="text-gray-700 text-base leading-relaxed">
-                      {fb.comentario}
-                    </p>
+                    <p className="text-black text-base leading-relaxed">{fb.comentario}</p>
                   </Card>
                 </TextToSpeechHover>
               ))}
